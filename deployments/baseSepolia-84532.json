@@ -1,0 +1,14 @@
+{
+  "network": "baseSepolia",
+  "chainId": "84532",
+  "deployer": "0xd591Ea697A2530a45133fFD949ffD8C9bE20706b",
+  "timestamp": "2025-10-03T21:05:44.972Z",
+  "contracts": {
+    "TrigImmutableCore": {
+      "address": "0x0932b427fce27cAf69b36BAd1C33325835740DE0",
+      "owner": "0xd591Ea697A2530a45133fFD949ffD8C9bE20706b",
+      "blockNumber": 31878628,
+      "transactionHash": "0xa9e060b4a8784577f1dfe30a8e926a2a28ecbc03fae8a57a2075535275c492e4"
+    }
+  }
+}

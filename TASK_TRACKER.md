@@ -389,39 +389,39 @@ Phase 5 (Hours 60-72): 0/9 ⏳
 
 ### **Hour 24-30: Steward Oracle Registry**
 
-#### Task 3.1: Create StewardOracleRegistry Contract
-- [ ] Create `/contracts/steward/StewardOracleRegistry.sol`
-- [ ] Define data structures (VerifiedChurch, ChurchLeader)
-- [ ] Import OpenZeppelin AccessControl
-- [ ] Define roles (CHURCH_ADMIN, LEADER_ROLE)
-- [ ] Add events for registration
+#### Task 3.1: Create StewardOracleRegistry Contract ✅
+- [x] Create `/contracts/steward/StewardOracleRegistry.sol`
+- [x] Define data structures (Organization, Leader, Verifier)
+- [x] Import OpenZeppelin AccessControl
+- [x] Define roles (VERIFIER_ROLE, PAUSER_ROLE)
+- [x] Add events for registration
 
 **Time**: 30 min | **Priority**: Critical | **Dependencies**: 2.25
 
-#### Task 3.2: Implement Church Registration
-- [ ] Implement `registerChurch()` function
-- [ ] Add church data validation
-- [ ] Implement staking requirement (1 ETH minimum)
-- [ ] Store church metadata
-- [ ] Emit registration events
+#### Task 3.2: Implement Organization Registration ✅
+- [x] Implement `registerOrganization()` function
+- [x] Add organization data validation
+- [x] Implement staking requirement (0.1 ETH minimum)
+- [x] Store organization metadata
+- [x] Emit registration events
 
 **Time**: 45 min | **Priority**: Critical | **Dependencies**: 3.1
 
-#### Task 3.3: Implement Leader Verification
-- [ ] Implement `verifyLeader()` function
-- [ ] Add leader staking (0.1 ETH minimum)
-- [ ] Implement verification by existing church
-- [ ] Add leader role assignment
-- [ ] Emit verification events
+#### Task 3.3: Implement Verifier System ✅
+- [x] Implement `verifyOrganization()` function
+- [x] Add verifier staking (0.5 ETH minimum)
+- [x] Implement multi-verifier approval (3 required)
+- [x] Add verifier role assignment
+- [x] Emit verification events
 
 **Time**: 45 min | **Priority**: Critical | **Dependencies**: 3.2
 
-#### Task 3.4: Implement Staking Mechanics
-- [ ] Create `/contracts/steward/StakingVerification.sol`
-- [ ] Implement `stakeForVerification()` function
-- [ ] Add stake withdrawal with timelock
-- [ ] Calculate verification power based on stake
-- [ ] Track staking history
+#### Task 3.4: Implement Staking Mechanics ✅
+- [x] Integrated into StewardOracleRegistry.sol
+- [x] Implement staking functions for orgs and verifiers
+- [x] Add stake increase functionality
+- [x] Calculate verification power based on stake
+- [x] Track staking history
 
 **Time**: 1 hour | **Priority**: Critical | **Dependencies**: 3.3
 
