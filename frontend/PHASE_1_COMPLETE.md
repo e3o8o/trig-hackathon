@@ -46,20 +46,15 @@ Four key metrics displayed prominently:
 - **Monthly Commitment**: Active monthly total ($1,700)
 - **Yearly Impact**: Projected annual giving ($20,400)
 
-### 3. **Pending Execution Flow**
-- "Execute Tithe Payment Now" button only on pending commitments
-- Opens modal with payment details
-- Simulates 2.5-second blockchain transaction
-- Updates giving history automatically
-- Shows success confirmation
+### 3. **Execution History Display**
+Shows completed executions (automated by backend):
+- Last executed date
+- Next expected execution date
+- Total execution count
+- Total amount given
+- All automated by Trig Protocol
 
-### 4. **Pending Executions Alert**
-- Amber alert banner when income detected
-- Shows count of pending payments
-- Calls attention to required actions
-- Lightning bolt icon for urgency
-
-### 5. **Commitment Management**
+### 4. **Commitment Management**
 Each commitment card shows:
 - ✅ Church name and location
 - ✅ Income threshold and percentages
@@ -68,17 +63,14 @@ Each commitment card shows:
 - ✅ Total given and yearly projection
 - ✅ Action buttons (Pause/Resume, Edit)
 
-### 6. **Interactive Features**
+### 5. **Interactive Features**
 - **Pause/Resume**: Toggle commitment status
 - **Edit**: Placeholder for editing commitments
-- **View History**: Link to filtered giving history
-- **Execute Now**: Manual payment trigger
 
-### 7. **Execution Modal**
-Three states:
-- **Confirmation**: Review payment details
-- **Processing**: Loading with blockchain message
-- **Success**: Green checkmark, auto-closes
+### 6. **Automated Execution**
+- Payments executed automatically by Trig Protocol backend
+- Frontend displays execution history only
+- No manual triggers or confirmation modals
 
 ---
 
@@ -86,10 +78,9 @@ Three states:
 
 ### Visual Design
 - **Color Coding**:
-  - Indigo: Active commitments
-  - Amber: Pending executions
-  - Green: Success, tithe amounts
-  - Gray: Paused commitments
+  - Indigo: Active commitments, primary actions
+  - Green: Success states, tithe amounts
+  - Gray: Paused commitments, secondary info
   - Purple: Yearly projections
 
 - **Status Badges**:

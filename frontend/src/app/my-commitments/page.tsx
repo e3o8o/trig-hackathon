@@ -9,11 +9,8 @@ import {
   Church, 
   DollarSign, 
   Calendar,
-  Clock,
   Pause,
   Play,
-  Zap,
-  AlertCircle,
   Edit,
   CheckCircle,
   Spinner
@@ -30,21 +27,12 @@ interface TitheCommitment {
   tithePercentage: string
   offeringPercentage: string
   frequency: string
-  status: 'active' | 'paused' | 'pending'
+  status: 'active' | 'paused'
   createdAt: string
   lastExecuted: string | null
   nextExecution: string | null
   totalGiven: string
   executionCount: number
-}
-
-interface PendingExecution {
-  commitmentId: string
-  detectedIncome: string
-  calculatedTithe: string
-  calculatedOffering: string
-  total: string
-  timestamp: string
 }
 
 // Simulated data - would come from blockchain in production
@@ -86,11 +74,6 @@ const SIMULATED_COMMITMENTS: TitheCommitment[] = [
 export default function MyCommitmentsPage() {
   const { address, isConnected } = useAccount()
   const [commitments, setCommitments] = useState<TitheCommitment[]>([])
-  const [pendingExecutions, setPendingExecutions] = useState<PendingExecution[]>([])
-  const [selectedCommitment, setSelectedCommitment] = useState<string | null>(null)
-  const [isExecuting, setIsExecuting] = useState(false)
-  const [showExecutionModal, setShowExecutionModal] = useState(false)
-  const [executionSuccess, setExecutionSuccess] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   // Load commitments on mount
@@ -116,43 +99,6 @@ export default function MyCommitmentsPage() {
       monthly: tithe + offering,
       yearly: (tithe + offering) * 12
     }
-  }
-
-  // Execute tithe payment
-  const executePayment = async () => {
-    if (!selectedCommitment) return
-
-    setIsExecuting(true)
-
-    // Simulate blockchain transaction
-    setTimeout(() => {
-      // Update commitment
-      setCommitments(commitments.map(c => {
-        if (c.id === selectedCommitment) {
-          const totals = calculateCommitmentTotals(c)
-          return {
-            ...c,
-            lastExecuted: new Date().toISOString().split('T')[0],
-            totalGiven: (parseFloat(c.totalGiven) + totals.total).toString(),
-            executionCount: c.executionCount + 1
-          }
-        }
-        return c
-      }))
-
-      // Remove from pending
-      setPendingExecutions(pendingExecutions.filter(p => p.commitmentId !== selectedCommitment))
-      
-      setIsExecuting(false)
-      setExecutionSuccess(true)
-
-      // Close modal after showing success
-      setTimeout(() => {
-        setShowExecutionModal(false)
-        setExecutionSuccess(false)
-        setSelectedCommitment(null)
-      }, 2000)
-    }, 2500)
   }
 
   // Toggle commitment status
@@ -335,43 +281,17 @@ export default function MyCommitmentsPage() {
               </div>
             </div>
 
-            {/* Pending Executions Alert */}
-            {pendingExecutions.length > 0 && (
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 mb-8">
-                <div className="flex items-start space-x-4">
-                  <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Zap className="w-6 h-6 text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-amber-900 mb-2">
-                      {pendingExecutions.length} Pending Execution{pendingExecutions.length > 1 ? 's' : ''}
-                    </h3>
-                    <p className="text-amber-800 mb-4">
-                      Income detected! Review and execute your tithe payments below.
-                    </p>
-                    <div className="flex items-center space-x-2">
-                      <Clock className="w-4 h-4 text-amber-600" />
-                      <span className="text-sm text-amber-700">Waiting for your confirmation</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Commitments List */}
             <div className="space-y-6">
               {commitments.map((commitment) => {
                 const totals = calculateCommitmentTotals(commitment)
-                const isPending = pendingExecutions.some(p => p.commitmentId === commitment.id)
                 const isPaused = commitment.status === 'paused'
 
                 return (
                   <div 
                     key={commitment.id} 
                     className={`bg-white rounded-xl shadow-md border-2 transition-all ${
-                      isPending 
-                        ? 'border-amber-300 shadow-amber-100' 
-                        : isPaused 
+                      isPaused 
                         ? 'border-slate-200 opacity-75' 
                         : 'border-indigo-200 hover:shadow-lg'
                     }`}
@@ -381,10 +301,10 @@ export default function MyCommitmentsPage() {
                       <div className="flex items-start justify-between mb-6">
                         <div className="flex items-start space-x-4">
                           <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
-                            isPending ? 'bg-amber-100' : isPaused ? 'bg-slate-100' : 'bg-indigo-100'
+                            isPaused ? 'bg-slate-100' : 'bg-indigo-100'
                           }`}>
                             <Church className={`w-8 h-8 ${
-                              isPending ? 'text-amber-600' : isPaused ? 'text-slate-400' : 'text-indigo-600'
+                              isPaused ? 'text-slate-400' : 'text-indigo-600'
                             }`} />
                           </div>
                           <div>
@@ -528,21 +448,6 @@ export default function MyCommitmentsPage() {
                         </div>
                       </div>
 
-                      {/* Action Button */}
-                      {isPending && !isPaused && (
-                        <div className="pt-4 border-t border-amber-200">
-                          <button
-                            onClick={() => {
-                              setSelectedCommitment(commitment.id)
-                              setShowExecutionModal(true)
-                            }}
-                            className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-2 font-semibold"
-                          >
-                            <Zap className="w-5 h-5" />
-                            <span>Execute Tithe Payment Now</span>
-                          </button>
-                        </div>
-                      )}
                     </div>
                   </div>
                 )
@@ -552,114 +457,6 @@ export default function MyCommitmentsPage() {
         )}
       </main>
 
-      {/* Execution Modal */}
-      {showExecutionModal && selectedCommitment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8">
-            {executionSuccess ? (
-              // Success State
-              <div className="text-center">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle className="w-12 h-12 text-green-600" />
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                  Payment Executed!
-                </h3>
-                <p className="text-slate-600 mb-6">
-                  Your tithe has been successfully transferred to the church.
-                </p>
-              </div>
-            ) : (
-              // Execution State
-              <>
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    {isExecuting ? (
-                      <Spinner className="w-10 h-10 text-indigo-600" />
-                    ) : (
-                      <Zap className="w-10 h-10 text-indigo-600" />
-                    )}
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                    {isExecuting ? 'Executing Payment...' : 'Execute Tithe Payment'}
-                  </h3>
-                  <p className="text-slate-600">
-                    {isExecuting 
-                      ? 'Confirming transaction on blockchain...'
-                      : 'Review the payment details and confirm execution.'
-                    }
-                  </p>
-                </div>
-
-                {!isExecuting && (
-                  <>
-                    {/* Payment Details */}
-                    <div className="bg-slate-50 rounded-xl p-6 mb-6">
-                      {(() => {
-                        const commitment = commitments.find(c => c.id === selectedCommitment)
-                        if (!commitment) return null
-                        const totals = calculateCommitmentTotals(commitment)
-                        
-                        return (
-                          <>
-                            <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-200">
-                              <span className="text-slate-600">Church:</span>
-                              <span className="font-semibold text-slate-900">
-                                {commitment.churchName}
-                              </span>
-                            </div>
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between">
-                                <span className="text-slate-600">Tithe Amount:</span>
-                                <span className="font-semibold text-green-600">
-                                  {formatCurrency(totals.tithe)}
-                                </span>
-                              </div>
-                              {totals.offering > 0 && (
-                                <div className="flex items-center justify-between">
-                                  <span className="text-slate-600">Offering Amount:</span>
-                                  <span className="font-semibold text-blue-600">
-                                    {formatCurrency(totals.offering)}
-                                  </span>
-                                </div>
-                              )}
-                              <div className="pt-3 border-t border-slate-300 flex items-center justify-between">
-                                <span className="font-bold text-slate-900">Total Payment:</span>
-                                <span className="font-bold text-2xl text-indigo-600">
-                                  {formatCurrency(totals.total)}
-                                </span>
-                              </div>
-                            </div>
-                          </>
-                        )
-                      })()}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex items-center space-x-4">
-                      <button
-                        onClick={() => {
-                          setShowExecutionModal(false)
-                          setSelectedCommitment(null)
-                        }}
-                        className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={executePayment}
-                        className="flex-1 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
-                      >
-                        Confirm & Execute
-                      </button>
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

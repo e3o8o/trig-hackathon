@@ -77,31 +77,18 @@ Each commitment card shows:
 - Creation date
 
 #### **Action Buttons**
-- **Pending State**: "Execute Tithe Payment Now" (amber button)
-- **Active State**: No execution button shown
-- **Paused State**: No execution button shown
+- Pause/Resume button to toggle commitment status
+- Edit button (placeholder for future functionality)
 
-### 5. **Execution Modal**
-Appears when user triggers payment:
+### 5. **Automated Execution**
+Payments are executed automatically by Trig Protocol:
 
-#### **Confirmation View**
-- Payment details summary
-- Church name
-- Tithe amount
-- Offering amount (if applicable)
-- Total payment amount (large, highlighted)
-- Cancel and Confirm buttons
-
-#### **Processing View**
-- Loading spinner
-- "Executing Payment..." message
-- "Confirming transaction on blockchain..." status
-
-#### **Success View**
-- Green checkmark icon
-- "Payment Executed!" message
-- Success confirmation text
-- Auto-closes after 2 seconds
+- Backend monitors wallet for incoming funds
+- Detects when income threshold is met
+- Automatically calculates and transfers tithe
+- Records transaction on blockchain
+- Updates execution history
+- No user action required
 
 ---
 
@@ -124,11 +111,6 @@ Appears when user triggers payment:
 ### State Management
 ```typescript
 const [commitments, setCommitments] = useState<TitheCommitment[]>([])
-const [pendingExecutions, setPendingExecutions] = useState<PendingExecution[]>([])
-const [selectedCommitment, setSelectedCommitment] = useState<string | null>(null)
-const [isExecuting, setIsExecuting] = useState(false)
-const [showExecutionModal, setShowExecutionModal] = useState(false)
-const [executionSuccess, setExecutionSuccess] = useState(false)
 const [isLoading, setIsLoading] = useState(true)
 ```
 
@@ -145,12 +127,6 @@ Returns: {
   yearly: number
 }
 ```
-
-#### `handleManualExecution(commitmentId)`
-Creates a pending execution record and opens the execution modal.
-
-#### `executePayment()`
-Simulates blockchain transaction (2.5 seconds), updates commitment history, and removes from pending.
 
 #### `toggleCommitmentStatus(commitmentId)`
 Switches commitment between "active" and "paused" states.

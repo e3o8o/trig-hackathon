@@ -41,12 +41,12 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 **User Story 1.2**: Believers can view and manage their tithe commitments
 - Dashboard with summary statistics (total given, monthly commitment)
 - View all active and paused commitments
-- Manual execution trigger (simulates Trig automation)
+- Execution history display (automated by Trig Protocol)
 - Pause/Resume commitment functionality
-- Execution modal with confirmation flow
 - Real-time calculation of giving amounts
+- Clean, display-only interface
 - 📄 See `MY_COMMITMENTS_FEATURE.md` for details
-- 📄 See `PHASE_1_COMPLETE.md` for implementation summary
+- 📄 See `AUTOMATED_EXECUTION_SIMPLIFICATION.md` for architecture
 
 ## 🗺️ Route Map
 
