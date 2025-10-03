@@ -1,6 +1,6 @@
 # Wallet Integration Setup
 
-This guide explains how to set up wallet connectivity for the StewardChain application.
+This guide explains how to set up wallet connectivity for the Steward application.
 
 ## Overview
 

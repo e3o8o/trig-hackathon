@@ -1,7 +1,7 @@
-# Copilot Instructions for StewardChain Next.js Project
+# Copilot Instructions for Steward Next.js Project
 
 ## Project Overview
-- This is a Next.js (TypeScript) frontend for the StewardChain platform.
+- This is a Next.js (TypeScript) frontend for the Steward platform.
 - Uses the App Router (`app/` directory) and is set up for wallet integration (wagmi, viem).
 
 ## Key Structure
@@ -40,7 +40,7 @@
 - Keep README.md up to date with new workflows
 - For more, see Next.js and wagmi documentation
 
-# 🚀 Trig Protocol + StewardChain: Team Briefing & User Stories
+# 🚀 Trig Protocol + Steward: Team Briefing & User Stories
 
 **Project**: Christian Financial Stewardship Platform on Blockchain
 **Duration**: 72-hour Hackathon
@@ -54,7 +54,7 @@
 ## 🎯 **What Are We Building? (30-Second Pitch)**
 
 
-We're building **StewardChain** - a blockchain platform that helps Christians practice faithful financial stewardship through automated giving, mission trip protection, and transparent church accountability. It's powered by **Trig Protocol**, which enables smart contracts that automatically execute when real-world conditions are met.
+We're building **Steward** - a blockchain platform that helps Christians practice faithful financial stewardship through automated giving, mission trip protection, and transparent church accountability. It's powered by **Trig Protocol**, which enables smart contracts that automatically execute when real-world conditions are met.
 
 
 **Think of it as**: "If This, Then That" (IFTTT) for Christian giving and insurance, backed by real money from DeFi protocols.
@@ -154,7 +154,7 @@ SO THAT I can track my stewardship and have records for tax purposes
 
 
 **Example Scenario**:
-> At tax time, Sarah needs her annual giving statement. She logs into StewardChain, views her complete history, and exports a report showing she gave $9,600 to church and $4,800 to missions in 2024.
+> At tax time, Sarah needs her annual giving statement. She logs into Steward, views her complete history, and exports a report showing she gave $9,600 to church and $4,800 to missions in 2024.
 
 
 ---
@@ -254,7 +254,7 @@ SO THAT members can tithe to us and we can verify other leaders
 
 
 **Example Scenario**:
-> Pastor Mike wants his church on StewardChain. He connects his wallet, enters "Grace Community Church, Dallas, TX", stakes 1 ETH as security deposit, and completes registration. Now his church members can set up automatic tithing to the church.
+> Pastor Mike wants his church on Steward. He connects his wallet, enters "Grace Community Church, Dallas, TX", stakes 1 ETH as security deposit, and completes registration. Now his church members can set up automatic tithing to the church.
 
 
 #### **User Story 3.2: Verify Church Leader**
@@ -334,7 +334,7 @@ graph LR
 
 
 **Example Scenario**:
-> Maria has $50,000 USDC sitting idle in Morpho earning 5% APY. She moves it to StewardChain's backing pool where she earns 12% APY (5% base + 7% from insurance premiums). Her capital backs mission trip insurance policies.
+> Maria has $50,000 USDC sitting idle in Morpho earning 5% APY. She moves it to Steward's backing pool where she earns 12% APY (5% base + 7% from insurance premiums). Her capital backs mission trip insurance policies.
 
 
 #### **User Story 4.2: Withdraw Backing**

@@ -11,7 +11,7 @@ export default function Home() {
           <div className="flex items-center space-x-2">
             <Shield className="w-8 h-8 text-indigo-600" />
             <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
-              StewardChain
+              Steward
             </span>
           </div>
           <div className="hidden md:flex items-center space-x-8">
@@ -239,7 +239,7 @@ export default function Home() {
                 Register Your Church Today
               </h2>
               <p className="text-xl text-indigo-100 mb-8 leading-relaxed">
-                Join 150+ churches already using StewardChain. Enable your congregation to give 
+                Join 150+ churches already using Steward. Enable your congregation to give 
                 automatically, verify mission protection claims, and provide full financial transparency.
               </p>
               <ul className="space-y-4 mb-8">
@@ -295,7 +295,7 @@ export default function Home() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Shield className="w-6 h-6 text-indigo-600" />
-                <span className="text-lg font-bold text-slate-900">StewardChain</span>
+                <span className="text-lg font-bold text-slate-900">Steward</span>
               </div>
               <p className="text-slate-600 text-sm">
                 Biblical stewardship powered by blockchain technology.
@@ -327,7 +327,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-slate-200 pt-8 text-center text-sm text-slate-600">
-            <p>&copy; 2025 StewardChain. All rights reserved. Built with faith and code.</p>
+            <p>&copy; 2025 Steward. All rights reserved. Built with faith and code.</p>
           </div>
         </div>
       </footer>
