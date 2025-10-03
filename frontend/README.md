@@ -27,7 +27,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 - Success confirmation
 - 📄 See `REGISTER_CHURCH_FEATURE.md` for details
 
-### 3. Create Tithe Commitment (`/create-tithe`) ✨ NEW
+### 3. Create Tithe Commitment (`/create-tithe`)
 **User Story 1.1**: Believers can set up automatic tithing
 - **Step 1**: Select verified church with search
 - **Step 2**: Configure income, tithe %, offering %, frequency
@@ -37,20 +37,32 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 - 📄 See `CREATE_TITHE_VISUAL_GUIDE.md` for UX flow
 - 📄 See `CREATE_TITHE_TESTING.md` for QA checklist
 
+### 4. My Commitments (`/my-commitments`) ✨ NEW
+**User Story 1.2**: Believers can view and manage their tithe commitments
+- Dashboard with summary statistics (total given, monthly commitment)
+- View all active and paused commitments
+- Manual execution trigger (simulates Trig automation)
+- Pause/Resume commitment functionality
+- Execution modal with confirmation flow
+- Real-time calculation of giving amounts
+- 📄 See `MY_COMMITMENTS_FEATURE.md` for details
+- 📄 See `PHASE_1_COMPLETE.md` for implementation summary
+
 ## 🗺️ Route Map
 
 ```
 /                    → Home page
 /register-church     → Church registration (Epic 3)
-/create-tithe        → Create tithe commitment (Epic 1)
+/create-tithe        → Create tithe commitment (Epic 1.1)
+/my-commitments      → View & manage commitments (Epic 1.2) ✨ NEW
 ```
 
 ## 🎯 User Stories Status
 
 - ✅ **Epic 3.1**: Register Church (COMPLETE)
 - ✅ **Epic 1.1**: Create Tithe Commitment (COMPLETE)
-- ⏳ **Epic 1.2**: Execute Tithe Payment (TODO)
-- ⏳ **Epic 1.3**: View Giving History (TODO)
+- ✅ **Epic 1.2**: Execute Tithe Payment - Phase 1 (COMPLETE) ✨ NEW
+- ⏳ **Epic 1.3**: View Giving History - Phase 2 (IN PROGRESS)
 - ⏳ **Epic 2**: Mission Trip Protection (TODO)
 
 ## 🛠️ Tech Stack

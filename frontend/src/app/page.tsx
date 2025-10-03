@@ -24,6 +24,9 @@ export default function Home() {
             <Link href="#for-churches" className="text-slate-700 hover:text-indigo-600 transition-colors">
               For Churches
             </Link>
+            <Link href="/my-commitments" className="text-slate-700 hover:text-indigo-600 transition-colors">
+              My Commitments
+            </Link>
             <Link href="/register-church" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
               Register Church
             </Link>
