@@ -24,6 +24,9 @@ export default function Home() {
             <Link href="#for-churches" className="text-slate-700 hover:text-indigo-600 transition-colors">
               For Churches
             </Link>
+            <Link href="/register-church" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+              Register Church
+            </Link>
             <WalletConnectButton />
           </div>
         </nav>
@@ -260,9 +263,9 @@ export default function Home() {
                   <span className="text-lg">Generate giving reports</span>
                 </li>
               </ul>
-              <button className="px-8 py-4 bg-white text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all shadow-xl hover:shadow-2xl font-semibold">
+              <Link href="/register-church" className="inline-block px-8 py-4 bg-white text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all shadow-xl hover:shadow-2xl font-semibold">
                 Register Your Church
-              </button>
+              </Link>
             </div>
             <div className="flex-shrink-0">
               <div className="w-64 h-64 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center">
