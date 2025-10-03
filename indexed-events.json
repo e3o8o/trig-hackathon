@@ -1,0 +1,182 @@
+{
+  "lastIndexedBlock": 47,
+  "lastUpdated": "2025-10-03T21:43:28.155Z",
+  "events": {
+    "conditions": [],
+    "organizations": [
+      {
+        "address": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+        "name": "Grace Community Church",
+        "stake": "0.1",
+        "blockNumber": 32,
+        "transactionHash": "0x0571ac6dee37440b37426cf32d518645a5b368fea2813f3d803136cd8a3c334d",
+        "timestamp": 1759526963,
+        "verified": true,
+        "verifiedAt": 1759526968
+      },
+      {
+        "address": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "name": "Hope Mission International",
+        "stake": "0.1",
+        "blockNumber": 33,
+        "transactionHash": "0xc79e950d1567e49a28ec9460ac73063d9a47b218c5e04a3d1339bdce4d7d574f",
+        "timestamp": 1759526964,
+        "verified": true,
+        "verifiedAt": 1759526971
+      },
+      {
+        "address": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+        "name": "Faith Foundation",
+        "stake": "0.1",
+        "blockNumber": 34,
+        "transactionHash": "0x3449d36b2e00a9a61a2a9ee67d10fdf6d48ad035b605fdb302d0f411dbf94851",
+        "timestamp": 1759526965,
+        "verified": true,
+        "verifiedAt": 1759526974
+      }
+    ],
+    "verifications": [
+      {
+        "organization": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+        "verifier": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "blockNumber": 35,
+        "transactionHash": "0x52c8dea8f666a1b6a9ae2b7c235b4ea841b84f388c9c64206be0cebf04171126",
+        "timestamp": 1759526966
+      },
+      {
+        "organization": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+        "verifier": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+        "blockNumber": 36,
+        "transactionHash": "0xe3a9207308e167959c5ad2ac97a8ec8df878b4084859889845ba1c8aa490173b",
+        "timestamp": 1759526967
+      },
+      {
+        "organization": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+        "verifier": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "blockNumber": 37,
+        "transactionHash": "0xf22b7e0ae350b4cd63a7e4e720bc80b5190ca546fb0119b8f3a5652740626e7d",
+        "timestamp": 1759526968
+      },
+      {
+        "organization": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "verifier": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "blockNumber": 38,
+        "transactionHash": "0x6173090cf9f0252c25eb1ae9e2f8e721639d038cd2c6f6310cc8585effcfba95",
+        "timestamp": 1759526969
+      },
+      {
+        "organization": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "verifier": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+        "blockNumber": 39,
+        "transactionHash": "0x6bc1e450303ad30e5814606a35aeaf44d01093b6001956023d73559742d36388",
+        "timestamp": 1759526970
+      },
+      {
+        "organization": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "verifier": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "blockNumber": 40,
+        "transactionHash": "0x38a90a172ed01f325646e69e2b7ace801f7804be0f4313787a6260a6e4363b2c",
+        "timestamp": 1759526971
+      },
+      {
+        "organization": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+        "verifier": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "blockNumber": 41,
+        "transactionHash": "0x042cf6cadcdcd8db46952ecaed41ed11b96d4e88179a7ffcc5eb84ed4e1cfb42",
+        "timestamp": 1759526972
+      },
+      {
+        "organization": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+        "verifier": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+        "blockNumber": 42,
+        "transactionHash": "0xe6f8ea546ce460e17edafd3d8e244e975de288963a69c6c9edfc686481f573e7",
+        "timestamp": 1759526973
+      },
+      {
+        "organization": "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+        "verifier": "0x976EA74026E726554dB657fA54763abd0C3a0aa9",
+        "blockNumber": 43,
+        "transactionHash": "0xcb6a5a56a8d8b68f9936599dc2dafeb6153ba4288717c550d253fda79bc675c5",
+        "timestamp": 1759526974
+      }
+    ],
+    "titheCommitments": [
+      {
+        "commitmentId": "0",
+        "giver": "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955",
+        "organization": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+        "amount": "0.01",
+        "frequency": 2,
+        "frequencyName": "MONTHLY",
+        "blockNumber": 44,
+        "transactionHash": "0x3f39bd22dfd1738caf1ddae90ce8d01fa6bf390e69b3d04fdb2c223200ce316b",
+        "timestamp": 1759526975,
+        "status": "ACTIVE"
+      },
+      {
+        "commitmentId": "1",
+        "giver": "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f",
+        "organization": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amount": "0.005",
+        "frequency": 0,
+        "frequencyName": "WEEKLY",
+        "blockNumber": 45,
+        "transactionHash": "0xe30d18ac974ec7f4c86fb55c3f23019688022954ad45b4766ea7cc8111a22de5",
+        "timestamp": 1759526976,
+        "status": "ACTIVE"
+      }
+    ],
+    "tithePayments": [
+      {
+        "commitmentId": "0",
+        "organization": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+        "amount": "0.01",
+        "blockNumber": 44,
+        "transactionHash": "0x3f39bd22dfd1738caf1ddae90ce8d01fa6bf390e69b3d04fdb2c223200ce316b",
+        "timestamp": 1759526975
+      },
+      {
+        "commitmentId": "1",
+        "organization": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amount": "0.005",
+        "blockNumber": 45,
+        "transactionHash": "0xe30d18ac974ec7f4c86fb55c3f23019688022954ad45b4766ea7cc8111a22de5",
+        "timestamp": 1759526976
+      }
+    ],
+    "missionPolicies": [
+      {
+        "policyId": "0",
+        "policyholder": "0x14dC79964da2C08b23698B3D3cc7Ca32193d9955",
+        "organization": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+        "coverageAmount": "1.0",
+        "premium": "0.02",
+        "blockNumber": 46,
+        "transactionHash": "0xefad165d2c2976770498bcd203cb9745d51e6bf39c6768106badc88e9f8dfc89",
+        "timestamp": 1759526977,
+        "status": "ACTIVE"
+      },
+      {
+        "policyId": "1",
+        "policyholder": "0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f",
+        "organization": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "coverageAmount": "2.0",
+        "premium": "0.04",
+        "blockNumber": 47,
+        "transactionHash": "0x6afd5a3c1fea322d52ae43fd1aca09b0afaccfbbd0f3c511204194084bf6acca",
+        "timestamp": 1759526978,
+        "status": "ACTIVE"
+      }
+    ],
+    "claims": []
+  },
+  "summary": {
+    "totalConditions": 0,
+    "totalOrganizations": 3,
+    "totalVerifications": 9,
+    "totalTitheCommitments": 2,
+    "totalTithePayments": 2,
+    "totalMissionPolicies": 2,
+    "totalClaims": 0
+  }
+}
