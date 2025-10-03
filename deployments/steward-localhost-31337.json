@@ -1,0 +1,34 @@
+{
+  "network": "localhost",
+  "chainId": "31337",
+  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "timestamp": "2025-10-03T20:55:25.889Z",
+  "contracts": {
+    "TrigImmutableCore": {
+      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+    },
+    "StewardOracleRegistry": {
+      "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      "minOrganizationStake": "0.1",
+      "minVerifierStake": "0.5",
+      "requiredVerifications": "3",
+      "blockNumber": 7,
+      "transactionHash": "0x89bcac53afc0bb935dd0abc178746b22791c71cd7ebe04c54602c354545b50ce"
+    },
+    "AutomatedTithe": {
+      "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      "trigCore": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "oracleRegistry": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      "blockNumber": 7,
+      "transactionHash": "0xfe6cf0848b53556fecd7f4ec83c18d0caf899d4523832df2fb82728253b91807"
+    },
+    "MissionProtection": {
+      "address": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+      "trigCore": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "oracleRegistry": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      "premiumRate": "2%",
+      "blockNumber": 7,
+      "transactionHash": "0x7f8d1378fb5d8122f97079481d46acaa6ce02992a01090bc3a9b90c21b8c78a2"
+    }
+  }
+}
