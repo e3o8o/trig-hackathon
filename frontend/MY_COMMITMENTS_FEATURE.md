@@ -57,7 +57,7 @@ Each commitment card shows:
 - Church location
 - Status badge (Active/Paused)
 - Commitment ID
-- Action buttons (Pause/Resume, Edit, View History)
+- Action buttons (Pause/Resume, Edit)
 
 #### **Income & Giving Details**
 - Income threshold
@@ -78,7 +78,7 @@ Each commitment card shows:
 
 #### **Action Buttons**
 - **Pending State**: "Execute Tithe Payment Now" (amber button)
-- **Active State**: "Trigger Manual Execution (Demo)" (blue button)
+- **Active State**: No execution button shown
 - **Paused State**: No execution button shown
 
 ### 5. **Execution Modal**
@@ -274,8 +274,7 @@ graph LR
 ### Links to Other Pages
 - **Home** (`/`): Back navigation
 - **Create Tithe** (`/create-tithe`): Create new commitment
-- **Giving History** (`/giving-history`): View full payment history
-- **Giving History (Filtered)** (`/giving-history?commitment={id}`): View specific commitment history
+- **Giving History** (`/giving-history`): View full payment history (coming in Phase 2)
 
 ### Wallet Integration
 - Uses `wagmi` `useAccount()` hook
@@ -332,13 +331,14 @@ const { hash } = await writeContract({
 - [ ] Wallet connection prompt shows when not connected
 - [ ] Commitments load correctly
 - [ ] Summary stats calculate accurately
-- [ ] Manual execution triggers modal
+- [ ] Pending execution triggers modal
 - [ ] Modal shows correct payment details
 - [ ] Execution updates commitment data
 - [ ] Success message displays
 - [ ] Modal auto-closes after success
 - [ ] Pause/Resume toggles work
 - [ ] Navigation links work correctly
+- [ ] No execution button on non-pending commitments
 
 ### Calculation Tests
 - [ ] Tithe percentage calculates correctly

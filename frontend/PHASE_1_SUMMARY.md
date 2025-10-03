@@ -3,12 +3,23 @@
 ## ✨ What Was Built
 
 A comprehensive **My Commitments** page that allows believers to:
-- View all their tithe commitments in one dashboard
+- View all their tithe commitments in### 4. **Demo Pending Execution** (45 seconds)
+> "In production, Trig Protocol monitors Sarah's wallet. When her paycheck arrives, it automatically calculates and executes the tithe. Notice this commitment has a pending execution..."
+
+[Click "Execute Tithe Payment Now"]
+
+> "The system shows the payment breakdown: $800 tithe, $400 offering, $1,200 total. Let's execute..."
+
+[Click "Confirm & Execute"]
+
+> "Watch it process... confirming on blockchain... and done! The payment executed successfully. Notice her total given updated to $4,800, and execution count increased to 4."
+
+### 5. Management Features (15 seconds)
+> "Sarah can pause any commitment if needed or edit details. Full control with blockchain transparency."d
 - See summary statistics (total given, monthly commitment, yearly impact)
-- Manually trigger tithe executions (simulates Trig Protocol automation)
+- Execute pending tithe payments (simulates Trig Protocol automation)
 - Pause and resume commitments
-- Access execution history
-- Navigate to giving history
+- Manage their giving commitments
 
 ---
 
@@ -32,7 +43,7 @@ A comprehensive **My Commitments** page that allows believers to:
 
 ### Files Modified
 1. **`src/components/Icons.tsx`**
-   - Added 9 new icons: Clock, Pause, Play, Zap, AlertCircle, RefreshCw, Edit, Trash, Eye
+   - Added 9 new icons: Clock, Pause, Play, Zap, AlertCircle, Edit
    
 2. **`src/app/page.tsx`**
    - Added "My Commitments" link to navigation
@@ -59,25 +70,24 @@ Each card displays:
 - ✅ Calculated tithe and offering amounts
 - ✅ Execution history (count, dates)
 - ✅ Total given and yearly projection
-- ✅ Action buttons (Pause, Edit, View)
+- ✅ Action buttons (Pause/Resume, Edit)
 
-### 3. Manual Execution (Demo Mode)
-- ✅ "Trigger Manual Execution" button
+### 3. Pending Execution Flow
+- ✅ "Execute Tithe Payment Now" button on pending commitments
 - ✅ Confirmation modal with payment details
 - ✅ 2.5-second blockchain simulation
 - ✅ Success confirmation with auto-close
 - ✅ Automatic history update
 
-### 4. Pending Executions
+### 4. Pending Executions Alert
 - ✅ Amber alert banner when income detected
 - ✅ Shows count of pending payments
-- ✅ "Execute Now" button with gradient
+- ✅ "Execute Now" button with amber gradient
 - ✅ Visual highlighting of pending cards
 
 ### 5. Commitment Management
 - ✅ Pause/Resume toggle with visual feedback
 - ✅ Edit button (placeholder for future)
-- ✅ View history link with filtering
 - ✅ Real-time calculation updates
 
 ### 6. Wallet Integration
@@ -159,12 +169,11 @@ Success Feedback
 - [x] Loading state displays
 - [x] Commitments load correctly
 - [x] Summary stats calculate accurately
-- [x] Manual execution opens modal
+- [x] Pending execution opens modal
 - [x] Modal shows correct details
 - [x] Execution updates history
 - [x] Success confirmation displays
 - [x] Pause/Resume works
-- [x] Navigation links work
 
 ### Calculation Tests ✅
 - [x] Tithe: $8,000 × 10% = $800 ✓
@@ -342,7 +351,7 @@ const { hash } = await writeContract({
 ### Features Delivered
 ✅ Comprehensive dashboard  
 ✅ Summary statistics  
-✅ Manual execution (demo mode)  
+✅ Pending execution flow  
 ✅ Pause/Resume functionality  
 ✅ Execution modal with 3 states  
 ✅ Responsive design  

@@ -46,8 +46,8 @@ Four key metrics displayed prominently:
 - **Monthly Commitment**: Active monthly total ($1,700)
 - **Yearly Impact**: Projected annual giving ($20,400)
 
-### 3. **Manual Execution (Demo Mode)**
-- "Trigger Manual Execution" button on each commitment
+### 3. **Pending Execution Flow**
+- "Execute Tithe Payment Now" button only on pending commitments
 - Opens modal with payment details
 - Simulates 2.5-second blockchain transaction
 - Updates giving history automatically
@@ -66,7 +66,7 @@ Each commitment card shows:
 - ✅ Calculated tithe and offering amounts
 - ✅ Execution history (count, dates)
 - ✅ Total given and yearly projection
-- ✅ Action buttons (Pause/Resume, Edit, View)
+- ✅ Action buttons (Pause/Resume, Edit)
 
 ### 6. **Interactive Features**
 - **Pause/Resume**: Toggle commitment status

@@ -14,8 +14,6 @@ import {
   Play,
   Zap,
   AlertCircle,
-  RefreshCw,
-  Eye,
   Edit,
   CheckCircle,
   Spinner
@@ -118,28 +116,6 @@ export default function MyCommitmentsPage() {
       monthly: tithe + offering,
       yearly: (tithe + offering) * 12
     }
-  }
-
-  // Handle manual execution (demo mode)
-  const handleManualExecution = (commitmentId: string) => {
-    const commitment = commitments.find(c => c.id === commitmentId)
-    if (!commitment) return
-
-    const totals = calculateCommitmentTotals(commitment)
-    
-    // Create pending execution
-    const pending: PendingExecution = {
-      commitmentId,
-      detectedIncome: commitment.incomeThreshold,
-      calculatedTithe: totals.tithe.toString(),
-      calculatedOffering: totals.offering.toString(),
-      total: totals.total.toString(),
-      timestamp: new Date().toISOString()
-    }
-
-    setPendingExecutions([...pendingExecutions, pending])
-    setSelectedCommitment(commitmentId)
-    setShowExecutionModal(true)
   }
 
   // Execute tithe payment
@@ -452,12 +428,6 @@ export default function MyCommitmentsPage() {
                           <button className="p-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
                             <Edit className="w-5 h-5" />
                           </button>
-                          <Link 
-                            href={`/giving-history?commitment=${commitment.id}`}
-                            className="p-2 bg-indigo-100 text-indigo-600 hover:bg-indigo-200 rounded-lg transition-colors"
-                          >
-                            <Eye className="w-5 h-5" />
-                          </Link>
                         </div>
                       </div>
 
@@ -562,23 +532,14 @@ export default function MyCommitmentsPage() {
                       {isPending && !isPaused && (
                         <div className="pt-4 border-t border-amber-200">
                           <button
-                            onClick={() => handleManualExecution(commitment.id)}
+                            onClick={() => {
+                              setSelectedCommitment(commitment.id)
+                              setShowExecutionModal(true)
+                            }}
                             className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all shadow-md hover:shadow-lg flex items-center justify-center space-x-2 font-semibold"
                           >
                             <Zap className="w-5 h-5" />
                             <span>Execute Tithe Payment Now</span>
-                          </button>
-                        </div>
-                      )}
-
-                      {!isPending && !isPaused && (
-                        <div className="pt-4 border-t border-slate-200">
-                          <button
-                            onClick={() => handleManualExecution(commitment.id)}
-                            className="w-full py-3 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-all flex items-center justify-center space-x-2 font-medium"
-                          >
-                            <RefreshCw className="w-5 h-5" />
-                            <span>Trigger Manual Execution (Demo)</span>
                           </button>
                         </div>
                       )}
