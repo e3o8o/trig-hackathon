@@ -1,0 +1,29 @@
+{
+  "network": "baseSepolia",
+  "chainId": "84532",
+  "deployer": "0xd591Ea697A2530a45133fFD949ffD8C9bE20706b",
+  "timestamp": "2025-10-03T21:10:00.000Z",
+  "contracts": {
+    "TrigImmutableCore": {
+      "address": "0x0932b427fce27cAf69b36BAd1C33325835740DE0"
+    },
+    "StewardOracleRegistry": {
+      "address": "0xd17e248f1De95D944c24c8AD5A609A460E7A2a41",
+      "minOrganizationStake": "0.1",
+      "minVerifierStake": "0.5",
+      "requiredVerifications": "3"
+    },
+    "AutomatedTithe": {
+      "address": "0xF13D32355F9B8a9889B5D3C745529f4bf4558E66",
+      "trigCore": "0x0932b427fce27cAf69b36BAd1C33325835740DE0",
+      "oracleRegistry": "0xd17e248f1De95D944c24c8AD5A609A460E7A2a41"
+    },
+    "MissionProtection": {
+      "address": "0x5a8278171AAfC8477f9Ff9621fe8eB4e2723C50e",
+      "trigCore": "0x0932b427fce27cAf69b36BAd1C33325835740DE0",
+      "oracleRegistry": "0xd17e248f1De95D944c24c8AD5A609A460E7A2a41",
+      "premiumRate": "2%"
+    }
+  }
+}
+
