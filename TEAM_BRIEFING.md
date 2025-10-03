@@ -1,6 +1,6 @@
 # 🚀 Trig Protocol + StewardChain: Team Briefing & User Stories
 
-**Project**: Christian Financial Stewardship Platform on Blockchain
+**Project**: Financial Stewardship Platform on Blockchain
 **Duration**: 72-hour Hackathon
 **Team Size**: 3 members (2 developers + 1 non-technical)
 **Target**: Working demo with real-world use cases
@@ -9,9 +9,9 @@
 
 ## 🎯 **What Are We Building? (30-Second Pitch)**
 
-We're building **StewardChain** - a blockchain platform that helps Christians practice faithful financial stewardship through automated giving, mission trip protection, and transparent church accountability. It's powered by **Trig Protocol**, which enables smart contracts that automatically execute when real-world conditions are met.
+We're building **Steward** - a blockchain platform that helps users practice faithful financial stewardship through automated giving, mission trip protection, and transparent organizational accountability. It's powered by **Trig Protocol**, which enables smart contracts that automatically execute when real-world conditions are met.
 
-**Think of it as**: "If This, Then That" (IFTTT) for Christian giving and insurance, backed by real money from DeFi protocols.
+**Think of it as**: "If This, Then That" (IFTTT) for giving and insurance, backed by real money from DeFi protocols.
 
 ---
 
@@ -20,7 +20,7 @@ We're building **StewardChain** - a blockchain platform that helps Christians pr
 ### **Developer 1 (Smart Contract Focus)**
 **Primary**: Backend blockchain development
 - Build core Trig Protocol contracts
-- Implement Christian oracle system
+- Implement Steward oracle system
 - Create DeFi backing integration
 - Write comprehensive tests
 - Deploy to Base testnet
@@ -56,7 +56,7 @@ We're building **StewardChain** - a blockchain platform that helps Christians pr
 
 #### **User Story 1.1: Create Tithe Commitment**
 ```
-AS A Christian believer
+AS A faithful steward
 I WANT TO set up automatic tithing to my church
 SO THAT I can practice consistent biblical giving without manual effort
 ```
@@ -417,7 +417,7 @@ sequenceDiagram
     participant Church as Pastor Mike (Church)
     participant UI as StewardChain Frontend
     participant Wallet as MetaMask Wallet
-    participant Registry as Christian Oracle Registry
+    participant Registry as Steward Oracle Registry
     participant Staking as Staking Contract
     participant Elder as Church Elder
     
@@ -468,14 +468,14 @@ sequenceDiagram
 
 > "Hi, I'm [Name] and we're presenting StewardChain. 
 > 
-> Did you know that Christians give over $50 billion annually to churches, but the process is manual, inconsistent, and lacks transparency? Mission trips worth millions of dollars have no protection when they're disrupted. And there's $16 billion of idle capital in DeFi earning minimal returns.
+> Did you know that faith-based giving exceeds $50 billion annually, but the process is manual, inconsistent, and lacks transparency? Mission trips worth millions of dollars have no protection when they're disrupted. And there's $16 billion of idle capital in DeFi earning minimal returns.
 >
 > StewardChain solves all three problems at once."
 
 ### **Minute 2: Solution Overview**
 **Speaker**: Developer 1
 
-> "We built two things: Trig Protocol - a blockchain infrastructure for parametric conditions, and StewardChain - Christian applications on top.
+> "We built two things: Trig Protocol - a blockchain infrastructure for parametric conditions, and Steward - financial stewardship applications on top.
 >
 > Let me show you our architecture..."
 > 
@@ -561,7 +561,7 @@ sequenceDiagram
 ### **Day 2 (Hours 24-48): Core Features**
 
 **Developer 1 Tasks**:
-- Hours 24-30: Christian Oracle Registry
+- Hours 24-30: Steward Oracle Registry
 - Hours 30-36: Automated Tithe contract
 - Hours 36-42: Mission Protection contract
 - Hours 42-48: Deploy and test all contracts
@@ -647,7 +647,7 @@ sequenceDiagram
 
 ### **For Non-Technical Member**
 - User stories (this document)
-- Christian use case examples
+- Steward use case examples
 - Demo script template (above)
 - Presentation outline (above)
 
@@ -662,10 +662,10 @@ sequenceDiagram
 ## 💡 **Key Messages to Remember**
 
 ### **What Makes This Special?**
-1. **Real-World Impact**: Helping Christians practice faithful stewardship
+1. **Real-World Impact**: Helping people practice faithful stewardship
 2. **Technical Innovation**: DeFi capital backing blockchain insurance
 3. **User Experience**: Simple, automatic, transparent
-4. **Market Opportunity**: $50B+ Christian giving market
+4. **Market Opportunity**: $50B+ faith-based giving market
 5. **Scalable Architecture**: Built to grow beyond hackathon
 
 ### **The "Wow" Moments**
@@ -732,5 +732,5 @@ A: Developer 1 handles smart contract questions. Developer 2 handles frontend/in
 **Team Ready**: Pending review  
 **Next Action**: Full team sync to discuss and confirm understanding
 
-**Remember**: We're building something meaningful. Have fun, support each other, and create something the Christian community will actually use! 🙏
+**Remember**: We're building something meaningful. Have fun, support each other, and create something people will actually use! 🙏
 

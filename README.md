@@ -1,6 +1,6 @@
 # 🚀 Trig Protocol + StewardChain: 72-Hour Hackathon
 
-**A Christian Financial Stewardship Platform on Blockchain**
+**A Financial Stewardship Platform on Blockchain**
 
 Built on Base Sepolia testnet with DeFi backing integration.
 
@@ -191,7 +191,7 @@ Watch: [5-Minute Demo](https://youtube.com/...) _(to be recorded)_
 
 ### Hackathon Goals
 - ✅ Working demo on testnet
-- ✅ 2+ Christian use cases operational
+- ✅ 2+ use cases operational
 - ✅ DeFi backing integrated
 - ✅ Polished frontend UI
 - ✅ 5-minute demo video
@@ -241,5 +241,5 @@ Special thanks to:
 
 ---
 
-**Built with ❤️ for the Christian community**
+**Built with ❤️ for faithful stewardship**
 

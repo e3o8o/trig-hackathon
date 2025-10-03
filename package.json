@@ -1,7 +1,7 @@
 {
   "name": "trig-hackathon",
   "version": "1.0.0",
-  "description": "A Christian Financial Stewardship Platform on Blockchain",
+  "description": "A Financial Stewardship Platform on Blockchain",
   "main": "index.js",
   "directories": {
     "doc": "docs",
@@ -19,7 +19,7 @@
     "defi",
     "parametric",
     "insurance",
-    "christian"
+    "stewardship"
   ],
   "author": "Trig Protocol Team",
   "license": "MIT",

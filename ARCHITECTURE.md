@@ -2,7 +2,7 @@
 
 **Project Duration**: 72 hours
 **Target**: Base Sepolia Testnet
-**Demo Focus**: Christian financial stewardship with DeFi backing
+**Demo Focus**: Financial stewardship with DeFi backing
 
 ---
 
@@ -12,7 +12,7 @@
 %%{ init: {'flowchart': {'htmlLabels': true}} }%%
 graph TD
     subgraph "User Layer"
-        A[Christian Users]
+        A[Users]
         B[Church Leaders]
         C[DeFi Capital Providers]
     end
@@ -25,7 +25,7 @@ graph TD
     
     subgraph "Smart Contract Layer - Base Sepolia"
         G[TrigImmutableCore]
-        H[ChristianOracleRegistry]
+        H[StewardOracleRegistry]
         I[AutomatedTithe]
         J[MissionProtection]
         K[DeFiBackingPool]
@@ -93,9 +93,9 @@ graph TD
 - LayerZero message handling
 ```
 
-### **2. Christian Application Layer**
+### **2. Steward Application Layer**
 
-#### **ChristianOracleRegistry.sol**
+#### **StewardOracleRegistry.sol**
 ```solidity
 // Staking-based verification system
 struct VerifiedChurch {
@@ -406,7 +406,7 @@ interface TestimonyMetadata {
   - Claim processing
   - Time-based logic
   
-- ChristianOracleRegistry.t.sol
+- StewardOracleRegistry.t.sol
   - Church registration
   - Leader verification
   - Staking mechanics
@@ -475,7 +475,7 @@ Hour 18-24: Deployment Scripts
 - Initial integration testing
 ```
 
-### **Phase 3: Christian Applications (Hours 24-48)**
+### **Phase 3: Steward Applications (Hours 24-48)**
 ```bash
 Hour 24-30: Oracle Registry
 - Church registration
