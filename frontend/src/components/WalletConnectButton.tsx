@@ -1,13 +1,33 @@
 'use client'
 
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Spinner } from './Icons'
 
 export function WalletConnectButton() {
   const { address, isConnected } = useAccount()
   const { connect, connectors, isPending } = useConnect()
   const { disconnect } = useDisconnect()
   const [showConnectors, setShowConnectors] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Fix hydration mismatch by only rendering wallet state after mount
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Show loading state until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <button
+        disabled
+        className="px-6 py-2 bg-indigo-600 text-white rounded-lg opacity-50 cursor-not-allowed flex items-center space-x-2"
+      >
+        <Spinner className="h-5 w-5 text-white" />
+        <span>Loading...</span>
+      </button>
+    )
+  }
 
   if (isConnected && address) {
     return (
@@ -33,9 +53,10 @@ export function WalletConnectButton() {
       <button
         onClick={() => setShowConnectors(!showConnectors)}
         disabled={isPending}
-        className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
       >
-        {isPending ? 'Connecting...' : 'Connect Wallet'}
+        {isPending && <Spinner className="h-5 w-5 text-white" />}
+        <span>{isPending ? 'Connecting...' : 'Connect Wallet'}</span>
       </button>
 
       {showConnectors && (

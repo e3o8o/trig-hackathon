@@ -23,6 +23,7 @@
 - Prefer functional React components
 - Use the App Router (`app/` directory) for all routing
 - Use only Tailwind classes and write minimum custom CSS
+- Save all SVG elements in `components/Icons.tsx`
 - Use CSS modules or global styles in `styles/`
 - Place reusable UI in `components/`
 - Use `wagmi` hooks for wallet state/connection
