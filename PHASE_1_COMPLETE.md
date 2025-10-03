@@ -249,11 +249,11 @@ deployments/
 
 ### **Next Steps** (Hours 6-24)
 
-**Focus**: Christian Applications + DeFi Integration
+**Focus**: Steward Applications + DeFi Integration
 
 **Key Tasks** (25 tasks):
-1. **ChristianOracleRegistry** - Church/leader verification with staking
-2. **AutomatedTithe** - Automated tithing system
+1. **StewardOracleRegistry** - Organization verification with staking
+2. **AutomatedTithe** - Automated giving system
 3. **MissionProtection** - Trip insurance contracts
 4. **MockMorpho** - DeFi backing integration
 5. **Integration Tests** - End-to-end testing
@@ -345,6 +345,6 @@ Blockers:           0
 ---
 
 **Completion Time**: October 3, 2025, ~3.5 hours  
-**Next Milestone**: Christian Contracts Implementation  
+**Next Milestone**: Steward Contracts Implementation  
 **Status**: 🟢 **ON TRACK FOR HACKATHON SUCCESS!**
 

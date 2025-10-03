@@ -8,7 +8,7 @@ Built on Base Sepolia testnet with DeFi backing integration.
 
 ## 🎯 What We're Building
 
-**StewardChain** helps Christians practice faithful financial stewardship through:
+**Steward** helps users practice faithful financial stewardship through:
 - **Automated Tithing**: Set it once, tithe automatically
 - **Mission Protection**: Insurance for international mission trips
 - **Church Verification**: Blockchain-based accountability with staking
@@ -23,7 +23,7 @@ Powered by **Trig Protocol** - an omnichain parametric condition execution engin
 trig-hackathon/
 ├── contracts/          # Smart contracts
 │   ├── core/          # TrigImmutableCore protocol
-│   ├── christian/     # StewardChain applications
+│   ├── steward/       # Steward applications
 │   ├── defi/          # DeFi backing integration
 │   ├── mocks/         # Test contracts
 │   └── interfaces/    # Contract interfaces
@@ -93,10 +93,10 @@ Visit `http://localhost:3000` to see the application.
 - ✅ Multisig conditions
 - ✅ Cross-chain ready (LayerZero OApp)
 
-### StewardChain (Christian Apps)
+### Steward Applications
 - ✅ Automated Tithe System
 - ✅ Mission Trip Protection
-- ✅ Christian Oracle Registry
+- ✅ Steward Oracle Registry
 - ✅ Staking-based verification
 
 ### DeFi Integration
@@ -129,8 +129,8 @@ npx hardhat test test/unit/TrigImmutableCore.t.sol
 # Deploy core protocol
 npx hardhat run scripts/deploy-core.ts --network baseSepolia
 
-# Deploy Christian contracts
-npx hardhat run scripts/deploy-christian.ts --network baseSepolia
+# Deploy Steward contracts
+npx hardhat run scripts/deploy-steward.js --network baseSepolia
 
 # Verify contracts
 npx hardhat verify --network baseSepolia <CONTRACT_ADDRESS>
