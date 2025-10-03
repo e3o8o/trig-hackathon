@@ -98,7 +98,7 @@ writeContract({
 
 ### Demo Mode
 For hackathon demonstration purposes, the feature currently:
-- Simulates the blockchain transaction with a 2-second delay
+- Simulates the blockchain transaction with a 2-second delay (loading spinner not working in demo mode)
 - Generates a mock Church ID
 - Shows the complete user flow without requiring actual ETH
 
