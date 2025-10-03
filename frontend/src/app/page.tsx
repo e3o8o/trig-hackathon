@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, Shield, Heart, TrendingUp, CheckCircle, Users, Church, Plane } from '@/components/Icons';
+import { WalletConnectButton } from '@/components/WalletConnectButton';
 
 export default function Home() {
   return (
@@ -23,9 +24,7 @@ export default function Home() {
             <Link href="#for-churches" className="text-slate-700 hover:text-indigo-600 transition-colors">
               For Churches
             </Link>
-            <button className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg">
-              Connect Wallet
-            </button>
+            <WalletConnectButton />
           </div>
         </nav>
       </header>
