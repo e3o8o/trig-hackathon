@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import { ArrowRight, Shield, Heart, TrendingUp, CheckCircle, Users, Church, Plane } from '@/components/Icons';
 import { WalletConnectButton } from '@/components/WalletConnectButton';
+import { UserMenu } from '@/components/UserMenu';
 
 export default function Home() {
   const { isConnected } = useAccount();
@@ -51,7 +52,7 @@ export default function Home() {
             <Link href="/register-church" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
               Register Church
             </Link>
-            <WalletConnectButton />
+            {isConnected ? <UserMenu /> : <WalletConnectButton />}
           </div>
         </nav>
       </header>
@@ -111,7 +112,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
               Everything You Need for
-              <span className="block text-indigo-600">Biblical Stewardship</span>
+              <span className="block text-indigo-600 leading-normal">Biblical Stewardship</span>
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
               Powerful tools that make giving, protection, and transparency effortless
