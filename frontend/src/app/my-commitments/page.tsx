@@ -475,18 +475,18 @@ export default function MyCommitmentsPage() {
                             <div className="flex items-center justify-between">
                               <span className="text-slate-600">Income Threshold:</span>
                               <span className="font-semibold text-slate-900">
-                                {formatCurrency(commitment.incomeThreshold)}
+                                {formatCurrency((commitment as any).incomeThreshold || 0)}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-slate-600">Tithe ({commitment.tithePercentage}%):</span>
+                              <span className="text-slate-600">Tithe ({(commitment as any).tithePercentage || 10}%):</span>
                               <span className="font-semibold text-green-600">
                                 {formatCurrency(totals.tithe)}
                               </span>
                             </div>
-                            {parseFloat(commitment.offeringPercentage) > 0 && (
+                            {parseFloat((commitment as any).offeringPercentage || '0') > 0 && (
                               <div className="flex items-center justify-between">
-                                <span className="text-slate-600">Offering ({commitment.offeringPercentage}%):</span>
+                                <span className="text-slate-600">Offering ({(commitment as any).offeringPercentage || 0}%):</span>
                                 <span className="font-semibold text-blue-600">
                                   {formatCurrency(totals.offering)}
                                 </span>
