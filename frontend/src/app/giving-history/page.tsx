@@ -57,7 +57,6 @@ export default function GivingHistoryPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [viewMode, setViewMode] = useState<'list' | 'chart'>('list');
   const [expandedTx, setExpandedTx] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState<boolean>(false);
 
   // Mock transaction data
   const transactions: Transaction[] = useMemo(() => {
@@ -493,23 +492,77 @@ export default function GivingHistoryPage() {
           </div>
         </div>
 
+        {/* Yearly Summary Section */}
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5" />
+            Yearly Summary
+          </h3>
+          <div className="space-y-4">
+            {yearlyStats.map(stats => (
+              <div
+                key={stats.year}
+                onClick={() => {
+                  setSelectedYear(stats.year);
+                  setSelectedMonth('all');
+                }}
+                className={`p-4 rounded-lg border-2 transition-colors cursor-pointer hover:shadow-md ${
+                  stats.year === selectedYear
+                    ? 'border-indigo-500 bg-indigo-50'
+                    : 'border-gray-200 bg-gray-50 hover:border-indigo-300'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-lg font-bold text-gray-900">{stats.year}</h4>
+                  <span className="text-sm text-indigo-600 font-medium">
+                    View Details →
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Total Given</p>
+                    <p className="text-lg font-bold text-gray-900">
+                      {formatCurrency(stats.totalGiven)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Tithes</p>
+                    <p className="text-lg font-bold text-green-600">
+                      {formatCurrency(stats.titheTotal)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Offerings</p>
+                    <p className="text-lg font-bold text-purple-600">
+                      {formatCurrency(stats.offeringTotal)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Transactions</p>
+                    <p className="text-lg font-bold text-gray-900">
+                      {stats.transactionCount}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Churches</p>
+                    <p className="text-lg font-bold text-gray-900">
+                      {stats.churches.size}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Filters */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <Filter className="w-5 h-5" />
-              Filters
-            </h3>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
-            >
-              {showFilters ? 'Hide' : 'Show'}
-            </button>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
+            <Filter className="w-5 h-5" />
+            Filters
+          </h3>
 
-          {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* Year Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -579,7 +632,6 @@ export default function GivingHistoryPage() {
                 </div>
               </div>
             </div>
-          )}
         </div>
 
         {/* Chart View */}
@@ -783,71 +835,6 @@ export default function GivingHistoryPage() {
             )}
           </div>
         )}
-
-        {/* Yearly Summary Section */}
-        <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            Yearly Summary
-          </h3>
-          <div className="space-y-4">
-            {yearlyStats.map(stats => (
-              <div
-                key={stats.year}
-                className={`p-4 rounded-lg border-2 transition-colors ${
-                  stats.year === selectedYear
-                    ? 'border-indigo-500 bg-indigo-50'
-                    : 'border-gray-200 bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-lg font-bold text-gray-900">{stats.year}</h4>
-                  <button
-                    onClick={() => {
-                      setSelectedYear(stats.year);
-                      setSelectedMonth('all');
-                    }}
-                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
-                  >
-                    View Details →
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Total Given</p>
-                    <p className="text-lg font-bold text-gray-900">
-                      {formatCurrency(stats.totalGiven)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Tithes</p>
-                    <p className="text-lg font-bold text-green-600">
-                      {formatCurrency(stats.titheTotal)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Offerings</p>
-                    <p className="text-lg font-bold text-purple-600">
-                      {formatCurrency(stats.offeringTotal)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Transactions</p>
-                    <p className="text-lg font-bold text-gray-900">
-                      {stats.transactionCount}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">Churches</p>
-                    <p className="text-lg font-bold text-gray-900">
-                      {stats.churches.size}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );
