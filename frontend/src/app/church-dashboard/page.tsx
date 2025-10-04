@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { parseEther } from 'viem'
 import Link from 'next/link'
@@ -96,9 +96,15 @@ const SIMULATED_LEADERS: ChurchLeader[] = [
 
 export default function ChurchDashboard() {
   const { address, isConnected } = useAccount()
+  const [mounted, setMounted] = useState(false)
   const [showAddLeaderModal, setShowAddLeaderModal] = useState(false)
   const [leaders, setLeaders] = useState<ChurchLeader[]>(SIMULATED_LEADERS)
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'pending'>('all')
+  
+  // Fix hydration error by only rendering after client mount
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   
   // Add leader form state
   const [newLeader, setNewLeader] = useState({
@@ -305,7 +311,17 @@ export default function ChurchDashboard() {
 
           {/* Leaders List */}
           <div className="p-6">
-            {!isConnected ? (
+            {!mounted ? (
+              <div className="text-center py-12">
+                <Loader2 className="w-16 h-16 text-slate-300 mx-auto mb-4 animate-spin" />
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
+                  Loading...
+                </h3>
+                <p className="text-slate-600">
+                  Checking wallet connection
+                </p>
+              </div>
+            ) : !isConnected ? (
               <div className="text-center py-12">
                 <Shield className="w-16 h-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-slate-900 mb-2">
