@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import { ArrowRight, Shield, Heart, TrendingUp, CheckCircle, Users, Church, Plane, X } from '@/components/Icons';
@@ -11,6 +11,12 @@ export default function Home() {
   const { isConnected } = useAccount();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Handle hydration
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
 
   const toggleFaq = (index: number) => {
     setOpenFaqIndex(openFaqIndex === index ? null : index);
@@ -30,7 +36,14 @@ export default function Home() {
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            {!isConnected && (
+            {!isHydrated ? (
+              // Show loading state during hydration
+              <>
+                <div className="w-16 h-4 bg-slate-200 rounded animate-pulse" />
+                <div className="w-20 h-4 bg-slate-200 rounded animate-pulse" />
+                <div className="w-24 h-4 bg-slate-200 rounded animate-pulse" />
+              </>
+            ) : !isConnected ? (
               <>
                 <Link href="#features" className="text-slate-700 hover:text-indigo-600 transition-colors">
                   Features
@@ -42,8 +55,7 @@ export default function Home() {
                   For Churches
                 </Link>
               </>
-            )}
-            {isConnected && (
+            ) : (
               <>
                 <Link href="/mission-protection" className="text-slate-700 hover:text-indigo-600 transition-colors">
                   Mission Protection
@@ -62,7 +74,7 @@ export default function Home() {
             <Link href="/register-church" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
               Register Church
             </Link>
-            {isConnected ? <UserMenu /> : <WalletConnectButton />}
+            {isHydrated ? (isConnected ? <UserMenu /> : <WalletConnectButton />) : <div className="w-24 h-10 bg-slate-200 rounded-lg animate-pulse" />}
           </div>
 
           {/* Mobile Menu Button */}
@@ -85,7 +97,14 @@ export default function Home() {
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 py-4 bg-white rounded-lg shadow-lg border border-slate-200">
             <div className="flex flex-col space-y-3 px-4">
-              {!isConnected && (
+              {!isHydrated ? (
+                // Show loading state during hydration
+                <>
+                  <div className="w-16 h-4 bg-slate-200 rounded animate-pulse" />
+                  <div className="w-20 h-4 bg-slate-200 rounded animate-pulse" />
+                  <div className="w-24 h-4 bg-slate-200 rounded animate-pulse" />
+                </>
+              ) : !isConnected ? (
                 <>
                   <Link 
                     href="#features" 
@@ -109,8 +128,7 @@ export default function Home() {
                     For Churches
                   </Link>
                 </>
-              )}
-              {isConnected && (
+              ) : (
                 <>
                   <Link 
                     href="/mission-protection" 
@@ -150,7 +168,7 @@ export default function Home() {
                 Register Church
               </Link>
               <div className="pt-2 border-t border-slate-200">
-                {isConnected ? <UserMenu /> : <WalletConnectButton />}
+                {isHydrated ? (isConnected ? <UserMenu /> : <WalletConnectButton />) : <div className="w-24 h-10 bg-slate-200 rounded-lg animate-pulse mx-auto" />}
               </div>
             </div>
           </div>
