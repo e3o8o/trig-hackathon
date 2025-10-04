@@ -35,9 +35,26 @@ export function useVerifiedOrganizations() {
           {
             address: '0xd591Ea697A2530a45133fFD949ffD8C9bE20706b', // Your deployer address
             name: 'Grace Community Church',
-            description: 'Dallas, TX | Non-denominational',
+            description: '123 Main St, Dallas, TX | Non-denominational',
             website: 'https://steward.network',
-            verified: false, // Will be false until 3 verifiers approve
+            verified: false, // Will show as "Pending Verification" (org verification requires 3 verifiers)
+            stakeAmount: '0.1',
+          },
+          // Additional demo organizations for testing UI
+          {
+            address: '0x0000000000000000000000000000000000000001', // Demo address
+            name: 'First Baptist Church',
+            description: 'Austin, TX | Baptist',
+            website: 'https://steward.network',
+            verified: false,
+            stakeAmount: '0.1',
+          },
+          {
+            address: '0x0000000000000000000000000000000000000002', // Demo address
+            name: 'New Hope Fellowship',
+            description: 'Houston, TX | Pentecostal',
+            website: 'https://steward.network',
+            verified: false,
             stakeAmount: '0.1',
           },
         ]
