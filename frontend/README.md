@@ -37,7 +37,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 - 📄 See `CREATE_TITHE_VISUAL_GUIDE.md` for UX flow
 - 📄 See `CREATE_TITHE_TESTING.md` for QA checklist
 
-### 4. My Commitments (`/my-commitments`) ✨ NEW
+### 4. My Commitments (`/my-commitments`)
 **User Story 1.2**: Believers can view and manage their tithe commitments
 - Dashboard with summary statistics (total given, monthly commitment)
 - View all active and paused commitments
@@ -48,21 +48,37 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 - 📄 See `MY_COMMITMENTS_FEATURE.md` for details
 - 📄 See `AUTOMATED_EXECUTION_SIMPLIFICATION.md` for architecture
 
+### 5. Giving History (`/giving-history`) ✨ NEW
+**User Story 1.3**: Believers can view complete giving history and download receipts
+- Complete transaction history with filtering
+- Summary statistics (total given, tithes, offerings, churches)
+- Filter by year, month, church, and search
+- Toggle between list and chart views
+- Monthly giving breakdown visualization
+- Expandable transaction details with blockchain proof
+- Export to CSV functionality
+- Tax receipt generation (PDF)
+- Yearly summary overview
+- Multi-year comparison
+- 📄 See `GIVING_HISTORY_FEATURE.md` for details
+- 📄 See `GIVING_HISTORY_VISUAL_GUIDE.md` for UX flow
+
 ## 🗺️ Route Map
 
 ```
 /                    → Home page
 /register-church     → Church registration (Epic 3)
 /create-tithe        → Create tithe commitment (Epic 1.1)
-/my-commitments      → View & manage commitments (Epic 1.2) ✨ NEW
+/my-commitments      → View & manage commitments (Epic 1.2)
+/giving-history      → View giving history & receipts (Epic 1.3) ✨ NEW
 ```
 
 ## 🎯 User Stories Status
 
 - ✅ **Epic 3.1**: Register Church (COMPLETE)
 - ✅ **Epic 1.1**: Create Tithe Commitment (COMPLETE)
-- ✅ **Epic 1.2**: Execute Tithe Payment - Phase 1 (COMPLETE) ✨ NEW
-- ⏳ **Epic 1.3**: View Giving History - Phase 2 (IN PROGRESS)
+- ✅ **Epic 1.2**: Execute Tithe Payment - Phase 1 (COMPLETE)
+- ✅ **Epic 1.3**: View Giving History - Phase 2 (COMPLETE) ✨ NEW
 - ⏳ **Epic 2**: Mission Trip Protection (TODO)
 
 ## 🛠️ Tech Stack
