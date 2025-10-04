@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { parseEther } from 'viem'
 import Link from 'next/link'
 import { ArrowLeft, Shield, Church, CheckCircle, Loader2 } from '@/components/Icons'
 import { WalletConnectButton } from '@/components/WalletConnectButton'
 import { UserMenu } from '@/components/UserMenu'
+import { CONTRACTS, ORACLE_CONFIG, getBlockExplorerUrl } from '@/config/contracts'
 
 interface ChurchFormData {
   name: string
@@ -83,45 +84,50 @@ export default function RegisterChurch() {
     }
 
     try {
-      // For demo purposes, we'll simulate the contract call
-      // In production, replace with actual contract address and ABI
-      const simulatedChurchId = `CHURCH-${Date.now()}`
+      // Combine address fields into description
+      const description = `${formData.streetAddress}, ${formData.city}, ${formData.stateProvince}, ${formData.country} | Denomination: ${formData.denomination}`
       
-      // Simulate transaction
-      setTimeout(() => {
-        setChurchId(simulatedChurchId)
-        setStep('success')
-      }, 2000)
+      // Create website URL (placeholder if not provided)
+      const website = 'https://steward.network' // Can be made editable later
+      
+      console.log('Registering organization:', {
+        name: formData.name,
+        description,
+        website,
+        stake: ORACLE_CONFIG.minOrganizationStake + ' ETH',
+      })
 
-      // Uncomment when contract is ready:
-      /*
+      // Call the smart contract
       writeContract({
-        address: '0x...', // Church Registry contract address
-        abi: [...], // Contract ABI
-        functionName: 'registerChurch',
+        ...CONTRACTS.oracle,
+        functionName: 'registerOrganization',
         args: [
           formData.name,
-          formData.streetAddress,
-          formData.city,
-          formData.stateProvince,
-          formData.country,
-          formData.denomination
+          description,
+          website,
         ],
-        value: parseEther('1'), // 1 ETH stake
+        value: parseEther(ORACLE_CONFIG.minOrganizationStake), // 0.1 ETH stake
       })
-      */
     } catch (error) {
       console.error('Registration error:', error)
+      alert('Failed to register church. Please try again.')
     }
   }
 
   // Handle transaction confirmation
-  if (isConfirmed && !churchId) {
-    // Extract church ID from transaction receipt
-    const generatedId = `CHURCH-${hash?.slice(0, 10)}`
-    setChurchId(generatedId)
-    setStep('success')
-  }
+  useEffect(() => {
+    if (isConfirmed && hash && !churchId) {
+      // Extract church ID from transaction
+      const generatedId = `ORG-${address?.slice(0, 10)}`
+      setChurchId(generatedId)
+      setStep('success')
+      console.log('Church registered successfully!', {
+        transactionHash: hash,
+        address,
+        blockExplorer: getBlockExplorerUrl(hash),
+      })
+    }
+  }, [isConfirmed, hash, churchId, address])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -344,7 +350,7 @@ export default function RegisterChurch() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-indigo-800">Registration Stake:</span>
-                    <span className="font-bold text-indigo-900 text-xl">1 ETH</span>
+                    <span className="font-bold text-indigo-900 text-xl">{ORACLE_CONFIG.minOrganizationStake} ETH</span>
                   </div>
                   <div className="text-sm text-indigo-700">
                     This stake will be locked in the smart contract and can be reclaimed when you unregister your church.
@@ -381,10 +387,10 @@ export default function RegisterChurch() {
                 {isWritePending || isConfirming ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>{isConfirming ? 'Confirming...' : 'Processing...'}</span>
+                    <span>{isConfirming ? 'Confirming on chain...' : 'Awaiting wallet...'}</span>
                   </>
                 ) : (
-                  <span>Confirm & Stake 1 ETH</span>
+                  <span>Confirm & Stake {ORACLE_CONFIG.minOrganizationStake} ETH</span>
                 )}
               </button>
             </div>
@@ -427,13 +433,26 @@ export default function RegisterChurch() {
                   </p>
                 </div>
                 <div>
-                  <span className="text-slate-600 text-sm">Church ID:</span>
-                  <p className="font-mono font-medium text-indigo-600 break-all">{churchId}</p>
+                  <span className="text-slate-600 text-sm">Organization Address:</span>
+                  <p className="font-mono font-medium text-indigo-600 break-all text-xs">{address}</p>
                 </div>
                 <div>
                   <span className="text-slate-600 text-sm">Staked Amount:</span>
-                  <p className="font-bold text-slate-900">1 ETH</p>
+                  <p className="font-bold text-slate-900">{ORACLE_CONFIG.minOrganizationStake} ETH</p>
                 </div>
+                {hash && (
+                  <div>
+                    <span className="text-slate-600 text-sm">Transaction:</span>
+                    <a 
+                      href={getBlockExplorerUrl(hash)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-xs text-indigo-600 hover:text-indigo-800 underline break-all block"
+                    >
+                      {hash.slice(0, 20)}...{hash.slice(-10)}
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
 
