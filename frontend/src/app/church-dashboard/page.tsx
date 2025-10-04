@@ -24,7 +24,6 @@ interface ChurchLeader {
   address: string
   name: string
   role: string
-  stakeAmount: string
   verifiedAt: string
   verificationsCount: number
   status: 'active' | 'pending' | 'inactive'
@@ -57,7 +56,6 @@ const SIMULATED_LEADERS: ChurchLeader[] = [
     address: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
     name: 'Pastor Mike Thompson',
     role: 'Senior Pastor',
-    stakeAmount: '1.0',
     verifiedAt: '2024-08-15',
     verificationsCount: 45,
     status: 'active'
@@ -67,7 +65,6 @@ const SIMULATED_LEADERS: ChurchLeader[] = [
     address: '0x853f46Dd7724D1632936a4c855Cd9f906f3cDcE',
     name: 'Elder John Davis',
     role: 'Elder',
-    stakeAmount: '0.1',
     verifiedAt: '2024-08-20',
     verificationsCount: 28,
     status: 'active'
@@ -77,7 +74,6 @@ const SIMULATED_LEADERS: ChurchLeader[] = [
     address: '0x964g57Ee8835E2743047b5d966Dd0a017g4eEdF',
     name: 'Elder Sarah Martinez',
     role: 'Elder',
-    stakeAmount: '0.1',
     verifiedAt: '2024-09-01',
     verificationsCount: 15,
     status: 'active'
@@ -87,7 +83,6 @@ const SIMULATED_LEADERS: ChurchLeader[] = [
     address: '0xa75h68Ff9946F3854158c6e977Ee1b128h5fFeG',
     name: 'Deacon James Wilson',
     role: 'Deacon',
-    stakeAmount: '0.05',
     verifiedAt: '2024-09-15',
     verificationsCount: 7,
     status: 'pending'
@@ -104,8 +99,7 @@ export default function ChurchDashboard() {
   const [newLeader, setNewLeader] = useState({
     address: '',
     name: '',
-    role: 'Elder',
-    stakeAmount: '0.1'
+    role: 'Elder'
   })
 
   const { 
@@ -128,7 +122,6 @@ export default function ChurchDashboard() {
       address: newLeader.address,
       name: newLeader.name,
       role: newLeader.role,
-      stakeAmount: newLeader.stakeAmount,
       verifiedAt: new Date().toISOString().split('T')[0],
       verificationsCount: 0,
       status: 'pending'
@@ -141,8 +134,7 @@ export default function ChurchDashboard() {
     setNewLeader({
       address: '',
       name: '',
-      role: 'Elder',
-      stakeAmount: '0.1'
+      role: 'Elder'
     })
   }
 
@@ -370,10 +362,6 @@ export default function ChurchDashboard() {
                               </div>
                             </div>
                             <div>
-                              <div className="text-xs text-slate-500 mb-1">Stake Amount</div>
-                              <div className="text-sm font-medium text-slate-900">{leader.stakeAmount} ETH</div>
-                            </div>
-                            <div>
                               <div className="text-xs text-slate-500 mb-1">Verified At</div>
                               <div className="text-sm font-medium text-slate-900">{leader.verifiedAt}</div>
                             </div>
@@ -386,12 +374,6 @@ export default function ChurchDashboard() {
                                 <span className="font-semibold text-slate-900">{leader.verificationsCount}</span> verifications
                               </span>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <CheckCircle className="w-4 h-4 text-green-600" />
-                              <span className="text-sm text-slate-600">
-                                <span className="font-semibold text-slate-900">{leader.stakeAmount}</span> ETH staked
-                              </span>
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -402,9 +384,6 @@ export default function ChurchDashboard() {
                             Approve
                           </button>
                         )}
-                        <button className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors text-sm font-medium">
-                          View Details
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -484,22 +463,9 @@ export default function ChurchDashboard() {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Required Stake Amount (ETH) *
-                </label>
-                <select
-                  value={newLeader.stakeAmount}
-                  onChange={(e) => setNewLeader({ ...newLeader, stakeAmount: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="1.0">1.0 ETH (Senior Pastor)</option>
-                  <option value="0.5">0.5 ETH (Associate Pastor)</option>
-                  <option value="0.1">0.1 ETH (Elder/Deacon)</option>
-                  <option value="0.05">0.05 ETH (Board Member)</option>
-                </select>
-                <p className="text-sm text-slate-500 mt-2">
-                  The leader will need to stake this amount to be verified
+              <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+                <p className="text-sm text-indigo-900">
+                  <strong>Stake Requirement:</strong> All leaders must stake 0.1 ETH as collateral for verification accountability.
                 </p>
               </div>
 
