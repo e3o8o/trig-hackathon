@@ -1,8 +1,12 @@
+'use client'
+
 import Link from 'next/link';
+import { useAccount } from 'wagmi';
 import { ArrowRight, Shield, Heart, TrendingUp, CheckCircle, Users, Church, Plane } from '@/components/Icons';
 import { WalletConnectButton } from '@/components/WalletConnectButton';
 
 export default function Home() {
+  const { isConnected } = useAccount();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Hero Section */}
@@ -15,27 +19,35 @@ export default function Home() {
             </span>
           </div>
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="#features" className="text-slate-700 hover:text-indigo-600 transition-colors">
-              Features
-            </Link>
-            <Link href="#how-it-works" className="text-slate-700 hover:text-indigo-600 transition-colors">
-              How It Works
-            </Link>
-            <Link href="#for-churches" className="text-slate-700 hover:text-indigo-600 transition-colors">
-              For Churches
-            </Link>
-            <Link href="/mission-protection" className="text-slate-700 hover:text-indigo-600 transition-colors">
-              Mission Protection
-            </Link>
-            <Link href="/my-commitments" className="text-slate-700 hover:text-indigo-600 transition-colors">
-              My Commitments
-            </Link>
-            <Link href="/giving-history" className="text-slate-700 hover:text-indigo-600 transition-colors">
-              Giving History
-            </Link>
-            <Link href="/church-dashboard" className="text-slate-700 hover:text-indigo-600 transition-colors">
-              Church Dashboard
-            </Link>
+            {!isConnected && (
+              <>
+                <Link href="#features" className="text-slate-700 hover:text-indigo-600 transition-colors">
+                  Features
+                </Link>
+                <Link href="#how-it-works" className="text-slate-700 hover:text-indigo-600 transition-colors">
+                  How It Works
+                </Link>
+                <Link href="#for-churches" className="text-slate-700 hover:text-indigo-600 transition-colors">
+                  For Churches
+                </Link>
+              </>
+            )}
+            {isConnected && (
+              <>
+                <Link href="/mission-protection" className="text-slate-700 hover:text-indigo-600 transition-colors">
+                  Mission Protection
+                </Link>
+                <Link href="/my-commitments" className="text-slate-700 hover:text-indigo-600 transition-colors">
+                  My Commitments
+                </Link>
+                <Link href="/giving-history" className="text-slate-700 hover:text-indigo-600 transition-colors">
+                  Giving History
+                </Link>
+                <Link href="/church-dashboard" className="text-slate-700 hover:text-indigo-600 transition-colors">
+                  Church Dashboard
+                </Link>
+              </>
+            )}
             <Link href="/register-church" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
               Register Church
             </Link>
@@ -94,16 +106,17 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="container mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-            Everything You Need for
-            <span className="block text-indigo-600">Biblical Stewardship</span>
-          </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Powerful tools that make giving, protection, and transparency effortless
-          </p>
-        </div>
+      {!isConnected && (
+        <section id="features" className="container mx-auto px-4 py-20">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              Everything You Need for
+              <span className="block text-indigo-600">Biblical Stewardship</span>
+            </h2>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              Powerful tools that make giving, protection, and transparency effortless
+            </p>
+          </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Feature 1 */}
@@ -191,9 +204,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* How It Works */}
-      <section id="how-it-works" className="container mx-auto px-4 py-20 bg-white/50 rounded-3xl my-20">
+      {!isConnected && (
+        <section id="how-it-works" className="container mx-auto px-4 py-20 bg-white/50 rounded-3xl my-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
             How It Works
@@ -246,9 +261,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* For Churches */}
-      <section id="for-churches" className="container mx-auto px-4 py-20">
+      {!isConnected && (
+        <section id="for-churches" className="container mx-auto px-4 py-20">
         <div className="max-w-5xl mx-auto bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl p-12 md:p-16 text-white shadow-2xl">
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="flex-1">
@@ -293,6 +310,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-20">
