@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import Link from 'next/link'
 import { 
   ArrowLeft, 
@@ -13,10 +13,13 @@ import {
   Play,
   Edit,
   CheckCircle,
-  Spinner
+  Spinner,
+  Loader2
 } from '@/components/Icons'
 import { WalletConnectButton } from '@/components/WalletConnectButton'
 import { UserMenu } from '@/components/UserMenu'
+import { CONTRACTS, getBlockExplorerUrl } from '@/config/contracts'
+import { useUserCommitments } from '@/hooks/useUserCommitments'
 
 // Types
 interface TitheCommitment {
@@ -74,19 +77,32 @@ const SIMULATED_COMMITMENTS: TitheCommitment[] = [
 
 export default function MyCommitmentsPage() {
   const { address, isConnected } = useAccount()
-  const [commitments, setCommitments] = useState<TitheCommitment[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  
+  // Get user's commitments from blockchain
+  const { commitments: blockchainCommitments, isLoading, hasCommitments } = useUserCommitments()
+  
+  // Transaction hooks for pause/resume
+  const { data: hash, isPending: isWritePending, writeContract, error: writeError } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash })
+  
+  const [processingCommitmentId, setProcessingCommitmentId] = useState<string | null>(null)
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false)
 
-  // Load commitments on mount
+  // For demo: show mock data if no real commitments yet
+  const commitments = hasCommitments ? blockchainCommitments : (isConnected ? SIMULATED_COMMITMENTS : [])
+
+  // Handle transaction confirmation
   useEffect(() => {
-    if (isConnected && address) {
-      // Simulate loading from blockchain
+    if (isConfirmed) {
+      setShowSuccessMessage(true)
+      setProcessingCommitmentId(null)
+      
+      // Hide success message after 5 seconds
       setTimeout(() => {
-        setCommitments(SIMULATED_COMMITMENTS)
-        setIsLoading(false)
-      }, 1000)
+        setShowSuccessMessage(false)
+      }, 5000)
     }
-  }, [isConnected, address])
+  }, [isConfirmed])
 
   // Calculate totals
   const calculateCommitmentTotals = (commitment: TitheCommitment) => {
@@ -102,17 +118,63 @@ export default function MyCommitmentsPage() {
     }
   }
 
-  // Toggle commitment status
-  const toggleCommitmentStatus = (commitmentId: string) => {
-    setCommitments(commitments.map(c => {
-      if (c.id === commitmentId) {
-        return {
-          ...c,
-          status: c.status === 'active' ? 'paused' : 'active'
-        }
+  // Pause/Resume commitment on blockchain
+  const handlePauseCommitment = async (commitmentId: string) => {
+    try {
+      setProcessingCommitmentId(commitmentId)
+      
+      // Extract numeric ID from string (e.g., "TITHE-1728234567890" -> parse as number)
+      const numericId = parseInt(commitmentId.split('-')[1] || commitmentId)
+      
+      console.log('Pausing commitment:', numericId)
+      
+      writeContract({
+        ...CONTRACTS.tithe,
+        functionName: 'pauseCommitment',
+        args: [BigInt(numericId)],
+      })
+    } catch (error) {
+      console.error('Error pausing commitment:', error)
+      alert('Failed to pause commitment. Please try again.')
+      setProcessingCommitmentId(null)
+    }
+  }
+
+  const handleResumeCommitment = async (commitmentId: string) => {
+    try {
+      setProcessingCommitmentId(commitmentId)
+      
+      // Extract numeric ID from string
+      const numericId = parseInt(commitmentId.split('-')[1] || commitmentId)
+      
+      console.log('Resuming commitment:', numericId)
+      
+      writeContract({
+        ...CONTRACTS.tithe,
+        functionName: 'resumeCommitment',
+        args: [BigInt(numericId)],
+      })
+    } catch (error) {
+      console.error('Error resuming commitment:', error)
+      alert('Failed to resume commitment. Please try again.')
+      setProcessingCommitmentId(null)
+    }
+  }
+
+  // For demo: fallback to mock toggle if using simulated data
+  const toggleCommitmentStatus = (commitmentId: string, currentStatus: 'active' | 'paused') => {
+    if (hasCommitments) {
+      // Use real blockchain calls
+      if (currentStatus === 'active') {
+        handlePauseCommitment(commitmentId)
+      } else {
+        handleResumeCommitment(commitmentId)
       }
-      return c
-    }))
+    } else {
+      // Demo mode: simulate toggle for mock data
+      // In real app, this wouldn't be needed
+      alert('⚠️ Demo mode: This would pause/resume your commitment on the blockchain.\n\nTo test with real transactions:\n1. Create a real commitment\n2. Then pause/resume will work!')
+    }
   }
 
   // Format currency
@@ -206,6 +268,47 @@ export default function MyCommitmentsPage() {
           </nav>
         </div>
       </header>
+
+      {/* Demo Data Notice */}
+      {!hasCommitments && commitments.length > 0 && (
+        <div className="bg-blue-50 border-b border-blue-200">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center space-x-3">
+              <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+              <p className="text-sm text-blue-900">
+                <strong>Demo Mode:</strong> Showing sample commitments. Create your first real commitment to see live blockchain data!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Notification */}
+      {showSuccessMessage && hash && (
+        <div className="bg-green-50 border-b border-green-200">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+                <div>
+                  <p className="font-semibold text-green-900">Transaction Confirmed!</p>
+                  <p className="text-sm text-green-700">
+                    Your commitment status has been updated.
+                  </p>
+                </div>
+              </div>
+              <a
+                href={getBlockExplorerUrl(hash)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-green-700 hover:text-green-900 underline"
+              >
+                View on Explorer →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
@@ -336,17 +439,27 @@ export default function MyCommitmentsPage() {
                         {/* Action Buttons */}
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => toggleCommitmentStatus(commitment.id)}
-                            className={`p-2 rounded-lg transition-colors ${
+                            onClick={() => toggleCommitmentStatus(commitment.id, commitment.status)}
+                            disabled={processingCommitmentId === commitment.id || isWritePending || isConfirming}
+                            className={`p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                               isPaused 
                                 ? 'bg-green-100 text-green-700 hover:bg-green-200' 
                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
                             title={isPaused ? 'Resume' : 'Pause'}
                           >
-                            {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+                            {processingCommitmentId === commitment.id && (isWritePending || isConfirming) ? (
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : isPaused ? (
+                              <Play className="w-5 h-5" />
+                            ) : (
+                              <Pause className="w-5 h-5" />
+                            )}
                           </button>
-                          <button className="p-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
+                          <button 
+                            className="p-2 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
+                            title="Edit Commitment (Coming Soon)"
+                          >
                             <Edit className="w-5 h-5" />
                           </button>
                         </div>
