@@ -14,9 +14,7 @@ interface ProtectionFormData {
   endDate: string
   coverageAmount: string
   tripPurpose: string
-  organizationType: 'registered' | 'custom'
-  churchId: string
-  organizationName: string
+  churchId: string // Required: Verified church for leader claim approval
 }
 
 // Verified churches from Epic 3.1 (same as Create Tithe)
@@ -138,9 +136,7 @@ export default function MissionProtection() {
     endDate: '',
     coverageAmount: '',
     tripPurpose: '',
-    organizationType: 'registered',
-    churchId: '',
-    organizationName: ''
+    churchId: ''
   })
 
   // Calculate premium based on coverage and destination
@@ -432,83 +428,29 @@ export default function MissionProtection() {
                   </select>
                 </div>
 
-                {/* Organization Selection */}
+                {/* Church Selection */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Church / Organization
+                    Registered Church *
                   </label>
                   
-                  {/* Toggle between registered church and custom */}
-                  <div className="flex gap-4 mb-4">
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, organizationType: 'registered', organizationName: '' })}
-                      className={`flex-1 px-4 py-2 rounded-lg border-2 transition-all ${
-                        formData.organizationType === 'registered'
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700 font-medium'
-                          : 'border-slate-300 text-slate-600 hover:border-slate-400'
-                      }`}
-                    >
-                      <Church className="w-5 h-5 mx-auto mb-1" />
-                      <div className="text-sm">Registered Church</div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, organizationType: 'custom', churchId: '' })}
-                      className={`flex-1 px-4 py-2 rounded-lg border-2 transition-all ${
-                        formData.organizationType === 'custom'
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700 font-medium'
-                          : 'border-slate-300 text-slate-600 hover:border-slate-400'
-                      }`}
-                    >
-                      <Users className="w-5 h-5 mx-auto mb-1" />
-                      <div className="text-sm">Other Organization</div>
-                    </button>
-                  </div>
-
-                  {/* Registered Church Dropdown */}
-                  {formData.organizationType === 'registered' && (
-                    <div>
-                      <select
-                        value={formData.churchId}
-                        onChange={(e) => {
-                          const selectedChurch = VERIFIED_CHURCHES.find(c => c.id === e.target.value)
-                          setFormData({ 
-                            ...formData, 
-                            churchId: e.target.value,
-                            organizationName: selectedChurch ? selectedChurch.name : ''
-                          })
-                        }}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      >
-                        <option value="">Select your church...</option>
-                        {VERIFIED_CHURCHES.map((church) => (
-                          <option key={church.id} value={church.id}>
-                            {church.name} - {church.location}
-                          </option>
-                        ))}
-                      </select>
-                      <p className="mt-2 text-sm text-slate-600">
-                        ✓ Registered churches can verify your claim for faster approval
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Custom Organization Input */}
-                  {formData.organizationType === 'custom' && (
-                    <div>
-                      <input
-                        type="text"
-                        value={formData.organizationName}
-                        onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
-                        placeholder="Enter your organization name"
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      />
-                      <p className="mt-2 text-sm text-slate-600">
-                        ℹ️ Claims may require additional verification
-                      </p>
-                    </div>
-                  )}
+                  <select
+                    value={formData.churchId}
+                    onChange={(e) => setFormData({ ...formData, churchId: e.target.value })}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select your church...</option>
+                    {VERIFIED_CHURCHES.map((church) => (
+                      <option key={church.id} value={church.id}>
+                        {church.name} - {church.location}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-2 text-sm text-slate-600 flex items-center gap-1">
+                    <Info className="w-4 h-4" />
+                    Claims require majority approval by church leadership.
+                  </p>
                 </div>
               </div>
 
@@ -522,7 +464,7 @@ export default function MissionProtection() {
                 </button>
                 <button
                   onClick={() => setStep('coverage')}
-                  disabled={!formData.startDate || !formData.endDate || !formData.tripPurpose || (!formData.churchId && !formData.organizationName)}
+                  disabled={!formData.startDate || !formData.endDate || !formData.tripPurpose || !formData.churchId}
                   className="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors font-medium"
                 >
                   Continue to Coverage
@@ -664,13 +606,13 @@ export default function MissionProtection() {
                       <div className="font-semibold text-slate-900">{formData.tripPurpose}</div>
                     </div>
                     <div className="col-span-2">
-                      <span className="text-slate-600">Organization:</span>
+                      <span className="text-slate-600">Registered Church:</span>
                       <div className="font-semibold text-slate-900 flex items-center gap-2">
-                        {formData.organizationName}
-                        {formData.organizationType === 'registered' && formData.churchId && (
+                        {VERIFIED_CHURCHES.find(c => c.id === formData.churchId)?.name || 'Not selected'}
+                        {formData.churchId && (
                           <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full flex items-center gap-1">
                             <CheckCircle className="w-3 h-3" />
-                            Verified Church
+                            Verified • Can Approve Claims
                           </span>
                         )}
                       </div>
@@ -854,9 +796,7 @@ export default function MissionProtection() {
                       endDate: '',
                       coverageAmount: '',
                       tripPurpose: '',
-                      organizationType: 'registered',
-                      churchId: '',
-                      organizationName: ''
+                      churchId: ''
                     })
                     setPolicyId('')
                   }}

@@ -18,11 +18,12 @@
 1. **Connect Wallet** → Click wallet button, connect MetaMask
 2. **Select Kenya** → Click Kenya card (Medium risk)
 3. **Set Dates** → Tomorrow + 30 days from tomorrow
-4. **Add Details** → "Medical Mission" + "Grace Community Church"
-5. **Choose $2,000** → Standard Protection (~$170 premium)
-6. **Review** → Check all details look correct
-7. **Purchase** → Click purchase button, wait 3 seconds
-8. **Success!** → See policy ID and confirmation
+4. **Select Church** → Choose "Grace Community Church" (required for claim verification)
+5. **Add Purpose** → "Medical Mission"
+6. **Choose $2,000** → Standard Protection (~$170 premium)
+7. **Review** → Check all details look correct
+8. **Purchase** → Click purchase button, wait 3 seconds
+9. **Success!** → See policy ID and confirmation
 
 **Expected Result**: Policy created with ID like `POLICY-1728000000-ABC123XYZ`
 
