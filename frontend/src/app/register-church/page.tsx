@@ -110,7 +110,6 @@ export default function RegisterChurch() {
       })
     } catch (error) {
       console.error('Registration error:', error)
-      alert('Failed to register church. Please try again.')
     }
   }
 
@@ -147,6 +146,33 @@ export default function RegisterChurch() {
           {isConnected ? <UserMenu /> : <WalletConnectButton />}
         </nav>
       </header>
+
+      {/* Success Notification Banner */}
+      {isConfirmed && hash && (
+        <div className="bg-green-50 border-b border-green-200">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+                <div>
+                  <p className="font-semibold text-green-900">Registration Successful!</p>
+                  <p className="text-sm text-green-700">
+                    Your church has been registered on the blockchain.
+                  </p>
+                </div>
+              </div>
+              <a
+                href={getBlockExplorerUrl(hash)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-green-700 hover:text-green-900 underline"
+              >
+                View Transaction →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12 max-w-4xl">
@@ -381,10 +407,15 @@ export default function RegisterChurch() {
               </button>
               <button
                 onClick={handleConfirmRegistration}
-                disabled={!isConnected || isWritePending || isConfirming}
+                disabled={!isConnected || isWritePending || isConfirming || isConfirmed}
                 className="flex-1 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
               >
-                {isWritePending || isConfirming ? (
+                {isConfirmed ? (
+                  <>
+                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span>Success! Redirecting...</span>
+                  </>
+                ) : isWritePending || isConfirming ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
                     <span>{isConfirming ? 'Confirming on chain...' : 'Awaiting wallet...'}</span>
@@ -397,7 +428,36 @@ export default function RegisterChurch() {
 
             {writeError && (
               <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-800 text-sm">Error: {writeError.message}</p>
+                <div className="flex items-start space-x-3">
+                  <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="flex-1">
+                    <p className="font-semibold text-red-900 mb-2">Registration Failed</p>
+                    {writeError.message.includes('Organization already registered') || 
+                     writeError.message.includes('already registered') ? (
+                      <>
+                        <p className="text-red-800 text-sm mb-3">
+                          This wallet address has already been used to register a church. Each wallet can only register one organization.
+                        </p>
+                        <div className="bg-red-100 rounded-lg p-3 text-sm text-red-800">
+                          <p className="font-medium mb-1">To register a new church:</p>
+                          <ul className="list-disc list-inside space-y-1 ml-2">
+                            <li>Switch to a different wallet address in MetaMask</li>
+                            <li>Or use your already registered church to receive tithes</li>
+                          </ul>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-red-800 text-sm mb-2">{writeError.message}</p>
+                        <p className="text-red-700 text-xs">
+                          Please try again or contact support if the issue persists.
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>
