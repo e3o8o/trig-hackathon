@@ -48,7 +48,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 - 📄 See `MY_COMMITMENTS_FEATURE.md` for details
 - 📄 See `AUTOMATED_EXECUTION_SIMPLIFICATION.md` for architecture
 
-### 5. Giving History (`/giving-history`) ✨ NEW
+### 5. Giving History (`/giving-history`) ✨
 **User Story 1.3**: Believers can view complete giving history and download receipts
 - Complete transaction history with filtering
 - Summary statistics (total given, tithes, offerings, churches)
@@ -63,6 +63,32 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 - 📄 See `GIVING_HISTORY_FEATURE.md` for details
 - 📄 See `GIVING_HISTORY_VISUAL_GUIDE.md` for UX flow
 
+### 6. Church Dashboard (`/church-dashboard`)
+**User Story 3.3**: Church leaders can view received tithes
+- Real-time dashboard with key metrics
+- Total tithes received display
+- Recent tithes list with donor information
+- Monthly breakdown visualization
+- Top contributors list
+- Verification status display
+- 📄 See `CHURCH_DASHBOARD_FEATURE.md` for details
+- 📄 See `CHURCH_DASHBOARD_VISUAL_GUIDE.md` for UX flow
+
+### 7. Mission Protection (`/mission-protection`) ✨ NEW
+**User Story 2.1**: Missionaries can purchase trip protection
+- **Step 1**: Select destination from 15 international locations with risk assessment
+- **Step 2**: Enter trip dates, duration, purpose, and organization
+- **Step 3**: Choose coverage amount ($1K-$10K) with real-time premium calculation
+- **Step 4**: Review complete policy details with terms and blockchain info
+- **Step 5**: Purchase and receive unique policy ID
+- Intelligent premium algorithm (based on risk, coverage, duration)
+- Risk level indicators (Low/Medium/High)
+- Coverage benefits display (5 key protections)
+- Automatic payout system (24-hour processing)
+- Church leader verification (2-of-3 multisig)
+- 📄 See `MISSION_PROTECTION_INDEX.md` for complete documentation
+- 📄 See `MISSION_PROTECTION_QUICK_REFERENCE.md` for quick start
+
 ## 🗺️ Route Map
 
 ```
@@ -70,16 +96,21 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 /register-church     → Church registration (Epic 3)
 /create-tithe        → Create tithe commitment (Epic 1.1)
 /my-commitments      → View & manage commitments (Epic 1.2)
-/giving-history      → View giving history & receipts (Epic 1.3) ✨ NEW
+/giving-history      → View giving history & receipts (Epic 1.3)
+/church-dashboard    → Church leader dashboard (Epic 3.3)
+/mission-protection  → Purchase mission trip insurance (Epic 2.1) ✨ NEW
 ```
 
 ## 🎯 User Stories Status
 
-- ✅ **Epic 3.1**: Register Church (COMPLETE)
 - ✅ **Epic 1.1**: Create Tithe Commitment (COMPLETE)
 - ✅ **Epic 1.2**: Execute Tithe Payment - Phase 1 (COMPLETE)
-- ✅ **Epic 1.3**: View Giving History - Phase 2 (COMPLETE) ✨ NEW
-- ⏳ **Epic 2**: Mission Trip Protection (TODO)
+- ✅ **Epic 1.3**: View Giving History - Phase 2 (COMPLETE)
+- ✅ **Epic 2.1**: Purchase Mission Protection (COMPLETE) ✨ NEW
+- ✅ **Epic 3.1**: Register Church (COMPLETE)
+- ✅ **Epic 3.3**: Church Dashboard (COMPLETE)
+- ⏳ **Epic 2.2**: File Mission Trip Claim (TODO - NEXT)
+- ⏳ **Epic 4**: DeFi Capital Backing (TODO)
 
 ## 🛠️ Tech Stack
 
@@ -127,12 +158,32 @@ src/
 
 ## 📚 Documentation
 
+### Epic 1: Automated Tithing
 - `CREATE_TITHE_COMPLETE.md` - Feature completion summary
 - `CREATE_TITHE_FEATURE.md` - Technical documentation  
 - `CREATE_TITHE_IMPLEMENTATION.md` - Implementation details
 - `CREATE_TITHE_VISUAL_GUIDE.md` - UX flow and visuals
 - `CREATE_TITHE_TESTING.md` - Testing checklist
+- `MY_COMMITMENTS_FEATURE.md` - Commitments management
+- `GIVING_HISTORY_FEATURE.md` - Giving history & receipts
+- `AUTOMATED_EXECUTION_SIMPLIFICATION.md` - Architecture
+
+### Epic 2: Mission Protection ✨ NEW
+- `MISSION_PROTECTION_INDEX.md` - Complete documentation index
+- `MISSION_PROTECTION_SUMMARY.md` - Executive summary
+- `MISSION_PROTECTION_FEATURE.md` - Complete feature docs
+- `MISSION_PROTECTION_VISUAL_GUIDE.md` - UI/UX specifications
+- `MISSION_PROTECTION_TESTING.md` - Testing procedures
+- `MISSION_PROTECTION_COMPLETE.md` - Completion summary
+- `MISSION_PROTECTION_QUICK_REFERENCE.md` - Quick reference
+- `MISSION_PROTECTION_ARCHITECTURE.md` - Architecture diagrams
+
+### Epic 3: Church Leadership
 - `REGISTER_CHURCH_FEATURE.md` - Church registration docs
+- `CHURCH_DASHBOARD_FEATURE.md` - Dashboard documentation
+- `CHURCH_DASHBOARD_VISUAL_GUIDE.md` - Dashboard UX flow
+
+### General
 - `WALLET_SETUP.md` - Wallet integration guide
 - `QUICK_START.md` - Quick start guide
 - `.github/copilot-instructions.md` - AI agent guidance
@@ -147,6 +198,25 @@ Run the dev server and test features:
    - Configure commitment
    - Preview amounts
    - Confirm (requires wallet)
+4. **My Commitments**: View and manage commitments
+   - See active commitments
+   - View execution history
+   - Pause/resume functionality
+5. **Giving History**: Review complete giving records
+   - Filter transactions
+   - View visualizations
+   - Export data
+   - Generate receipts
+6. **Church Dashboard**: View church metrics (requires church registration)
+   - See received tithes
+   - View contributors
+   - Monthly breakdown
+7. **Mission Protection**: Purchase trip insurance ✨ NEW
+   - Select destination (15 countries)
+   - Enter trip details
+   - Choose coverage ($1K-$10K)
+   - Review and purchase
+   - Receive policy ID
 
 ## 🔧 Configuration
 

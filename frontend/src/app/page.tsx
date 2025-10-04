@@ -24,6 +24,9 @@ export default function Home() {
             <Link href="#for-churches" className="text-slate-700 hover:text-indigo-600 transition-colors">
               For Churches
             </Link>
+            <Link href="/mission-protection" className="text-slate-700 hover:text-indigo-600 transition-colors">
+              Mission Protection
+            </Link>
             <Link href="/my-commitments" className="text-slate-700 hover:text-indigo-600 transition-colors">
               My Commitments
             </Link>
@@ -139,7 +142,7 @@ export default function Home() {
               Travel with peace of mind. Get automatic payouts if your mission 
               trip is disrupted or cancelled—no claims process.
             </p>
-            <ul className="space-y-3">
+            <ul className="space-y-3 mb-6">
               <li className="flex items-start space-x-2">
                 <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                 <span className="text-slate-700">Instant verification</span>
@@ -153,6 +156,12 @@ export default function Home() {
                 <span className="text-slate-700">Church-verified claims</span>
               </li>
             </ul>
+            <Link 
+              href="/mission-protection"
+              className="inline-flex items-center justify-center w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+            >
+              Get Protected
+            </Link>
           </div>
 
           {/* Feature 3 */}
