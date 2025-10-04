@@ -423,7 +423,7 @@ export default function ChurchDashboard() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Leader's Wallet Address *
+                  Leader&apos;s Wallet Address *
                 </label>
                 <input
                   type="text"
@@ -436,7 +436,7 @@ export default function ChurchDashboard() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Leader's Full Name *
+                  Leader&apos;s Full Name *
                 </label>
                 <input
                   type="text"

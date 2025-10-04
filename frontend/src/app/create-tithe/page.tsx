@@ -541,12 +541,12 @@ export default function CreateTithe() {
                     <span className="font-semibold text-slate-900">{selectedChurch?.name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Location:</span>
-                    <span className="font-semibold text-slate-900">{selectedChurch?.location}</span>
+                    <span className="text-slate-600">Website:</span>
+                    <span className="font-semibold text-slate-900">{selectedChurch?.website || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Church ID:</span>
-                    <span className="font-mono text-sm text-slate-700">{formData.churchId}</span>
+                    <span className="text-slate-600">Church Address:</span>
+                    <span className="font-mono text-sm text-slate-700">{selectedChurch?.address.slice(0, 10)}...{selectedChurch?.address.slice(-8)}</span>
                   </div>
                 </div>
               </div>

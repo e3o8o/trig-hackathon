@@ -181,8 +181,8 @@ export default function MissionProtection() {
 
   // Calculate premium based on coverage and destination
   const calculatePremium = () => {
-    // Use blockchain premium if available
-    if (blockchainPremium) {
+     // Use blockchain premium if available
+    if (blockchainPremium && typeof blockchainPremium === 'bigint') {
       return parseFloat(formatEther(blockchainPremium))
     }
 

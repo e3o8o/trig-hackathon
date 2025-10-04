@@ -200,10 +200,10 @@ export default function MyCommitmentsPage() {
   const summaryStats = {
     totalCommitments: commitments.length,
     activeCommitments: commitments.filter(c => c.status === 'active').length,
-    totalGiven: commitments.reduce((sum, c) => sum + parseFloat(c.totalGiven), 0),
+    totalGiven: commitments.reduce((sum, c) => sum + parseFloat((c as any).totalGiven || '0'), 0),
     monthlyCommitment: commitments
       .filter(c => c.status === 'active')
-      .reduce((sum, c) => sum + calculateCommitmentTotals(c).monthly, 0)
+      .reduce((sum, c) => sum + calculateCommitmentTotals(c as any).monthly, 0)
   }
 
   if (!isConnected) {
@@ -388,7 +388,7 @@ export default function MyCommitmentsPage() {
             {/* Commitments List */}
             <div className="space-y-6">
               {commitments.map((commitment) => {
-                const totals = calculateCommitmentTotals(commitment)
+                const totals = calculateCommitmentTotals(commitment as any)
                 const isPaused = commitment.status === 'paused'
 
                 return (
@@ -413,9 +413,9 @@ export default function MyCommitmentsPage() {
                           </div>
                           <div>
                             <h3 className="text-xl font-bold text-slate-900 mb-1">
-                              {commitment.churchName}
+                              {(commitment as any).churchName || (commitment as any).protectionName || 'N/A'}
                             </h3>
-                            <p className="text-slate-600 mb-2">{commitment.churchLocation}</p>
+                            <p className="text-slate-600 mb-2">{(commitment as any).churchLocation || (commitment as any).destination || 'N/A'}</p>
                             <div className="flex items-center space-x-3">
                               <span className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium ${
                                 commitment.status === 'active' 
@@ -439,7 +439,7 @@ export default function MyCommitmentsPage() {
                         {/* Action Buttons */}
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => toggleCommitmentStatus(commitment.id, commitment.status)}
+                            onClick={() => toggleCommitmentStatus(String(commitment.id), commitment.status)}
                             disabled={processingCommitmentId === commitment.id || isWritePending || isConfirming}
                             className={`p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                               isPaused 
