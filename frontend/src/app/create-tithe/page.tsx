@@ -1,14 +1,17 @@
 'use client'
 
-import { useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useState, useEffect } from 'react'
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { parseEther } from 'viem'
 import Link from 'next/link'
 import { ArrowLeft, Shield, Heart, CheckCircle, Loader2, Church, DollarSign, Calendar } from '@/components/Icons'
 import { WalletConnectButton } from '@/components/WalletConnectButton'
 import { UserMenu } from '@/components/UserMenu'
+import { CONTRACTS, FREQUENCY_ENUM, getBlockExplorerUrl } from '@/config/contracts'
+import { useVerifiedOrganizations } from '@/hooks/useVerifiedOrganizations'
 
 interface TitheFormData {
-  churchId: string
+  churchAddress: string
   churchName: string
   incomeThreshold: string
   tithePercentage: string
@@ -16,79 +19,12 @@ interface TitheFormData {
   frequency: string
 }
 
-// Simulated list of verified churches
-const VERIFIED_CHURCHES = [
-  {
-    id: 'CHURCH-001',
-    name: 'Grace Community Church',
-    location: 'Dallas, TX',
-    denomination: 'Non-denominational',
-    membersCount: 450,
-    verified: true
-  },
-  {
-    id: 'CHURCH-002',
-    name: 'First Baptist Church',
-    location: 'Austin, TX',
-    denomination: 'Baptist',
-    membersCount: 1200,
-    verified: true
-  },
-  {
-    id: 'CHURCH-003',
-    name: 'New Hope Fellowship',
-    location: 'Houston, TX',
-    denomination: 'Pentecostal',
-    membersCount: 320,
-    verified: true
-  },
-  {
-    id: 'CHURCH-004',
-    name: 'Covenant Presbyterian Church',
-    location: 'San Antonio, TX',
-    denomination: 'Presbyterian',
-    membersCount: 580,
-    verified: true
-  },
-  {
-    id: 'CHURCH-005',
-    name: 'Living Word Church',
-    location: 'Fort Worth, TX',
-    denomination: 'Non-denominational',
-    membersCount: 890,
-    verified: true
-  },
-  {
-    id: 'CHURCH-006',
-    name: 'St. Michael\'s Catholic Church',
-    location: 'Dallas, TX',
-    denomination: 'Catholic',
-    membersCount: 2100,
-    verified: true
-  },
-  {
-    id: 'CHURCH-007',
-    name: 'Christ the King Lutheran',
-    location: 'Plano, TX',
-    denomination: 'Lutheran',
-    membersCount: 650,
-    verified: true
-  },
-  {
-    id: 'CHURCH-008',
-    name: 'Cornerstone Assembly',
-    location: 'Irving, TX',
-    denomination: 'Assemblies of God',
-    membersCount: 410,
-    verified: true
-  }
-]
-
 const FREQUENCIES = [
   { value: 'monthly', label: 'Monthly (when income received)' },
   { value: 'biweekly', label: 'Bi-weekly (every 2 weeks)' },
   { value: 'weekly', label: 'Weekly' },
-  { value: 'onetime', label: 'One-time commitment' }
+  { value: 'quarterly', label: 'Quarterly (every 3 months)' },
+  { value: 'yearly', label: 'Yearly (annual tithe)' }
 ]
 
 export default function CreateTithe() {
@@ -96,10 +32,9 @@ export default function CreateTithe() {
   const [step, setStep] = useState<'select' | 'configure' | 'preview' | 'success'>('select')
   const [commitmentId, setCommitmentId] = useState<string>('')
   const [searchTerm, setSearchTerm] = useState('')
-  const [isProcessing, setIsProcessing] = useState(false)
   
   const [formData, setFormData] = useState<TitheFormData>({
-    churchId: '',
+    churchAddress: '',
     churchName: '',
     incomeThreshold: '',
     tithePercentage: '10',
@@ -107,17 +42,23 @@ export default function CreateTithe() {
     frequency: 'monthly'
   })
 
-  const filteredChurches = VERIFIED_CHURCHES.filter(church => 
-    church.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    church.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    church.denomination.toLowerCase().includes(searchTerm.toLowerCase())
+  // Get verified organizations from blockchain
+  const { organizations, isLoading: isLoadingOrgs } = useVerifiedOrganizations()
+
+  // Transaction hooks
+  const { data: hash, isPending: isWritePending, writeContract, error: writeError } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash })
+
+  const filteredChurches = organizations.filter(org => 
+    org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    org.description.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const handleChurchSelect = (church: typeof VERIFIED_CHURCHES[0]) => {
+  const handleChurchSelect = (org: typeof organizations[0]) => {
     setFormData({
       ...formData,
-      churchId: church.id,
-      churchName: church.name
+      churchAddress: org.address,
+      churchName: org.name
     })
     setStep('configure')
   }
@@ -131,7 +72,7 @@ export default function CreateTithe() {
 
   const isFormValid = () => {
     return (
-      formData.churchId !== '' &&
+      formData.churchAddress !== '' &&
       parseFloat(formData.incomeThreshold) > 0 &&
       parseFloat(formData.tithePercentage) > 0 &&
       parseFloat(formData.tithePercentage) <= 100
@@ -162,46 +103,54 @@ export default function CreateTithe() {
       return
     }
 
-    setIsProcessing(true)
-
     try {
-      // Simulate blockchain transaction
-      const simulatedCommitmentId = `TITHE-${Date.now()}`
+      const amounts = calculateMonthlyTithe()
+      const totalAmount = amounts.total.toString()
       
-      setTimeout(() => {
-        setCommitmentId(simulatedCommitmentId)
-        setIsProcessing(false)
-        setStep('success')
-      }, 2500)
-
-      // Uncomment when smart contract is ready:
-      /*
-      const { hash } = await writeContract({
-        address: '0x...', // Tithe Manager contract address
-        abi: [...], // Contract ABI
-        functionName: 'createTitheCommitment',
-        args: [
-          formData.churchId,
-          parseEther(formData.incomeThreshold),
-          BigInt(formData.tithePercentage * 100), // Store as basis points
-          BigInt(formData.offeringPercentage * 100),
-          formData.frequency
-        ],
+      // Map frequency string to enum
+      const frequencyEnum = FREQUENCY_ENUM[formData.frequency.toUpperCase() as keyof typeof FREQUENCY_ENUM]
+      
+      console.log('Creating commitment:', {
+        organization: formData.churchAddress,
+        amount: totalAmount + ' ETH',
+        frequency: formData.frequency,
+        frequencyEnum,
       })
-      
-      // Wait for confirmation
-      await waitForTransactionReceipt({ hash })
-      setCommitmentId(`TITHE-${hash.slice(0, 10)}`)
-      setStep('success')
-      */
+
+      // Call the smart contract
+      writeContract({
+        ...CONTRACTS.tithe,
+        functionName: 'createCommitment',
+        args: [
+          formData.churchAddress as `0x${string}`, // organization address
+          parseEther(totalAmount), // total tithe + offering amount
+          '0x0000000000000000000000000000000000000000' as `0x${string}`, // ETH (zero address)
+          frequencyEnum, // frequency enum
+          0, // no end time
+        ],
+        value: parseEther(totalAmount), // First payment
+      })
     } catch (error) {
       console.error('Commitment creation error:', error)
-      setIsProcessing(false)
       alert('Failed to create commitment. Please try again.')
     }
   }
 
-  const selectedChurch = VERIFIED_CHURCHES.find(c => c.id === formData.churchId)
+  // Handle transaction confirmation
+  useEffect(() => {
+    if (isConfirmed && hash && !commitmentId) {
+      const generatedId = `COMMIT-${hash.slice(0, 12)}`
+      setCommitmentId(generatedId)
+      setStep('success')
+      console.log('Commitment created successfully!', {
+        transactionHash: hash,
+        address,
+        blockExplorer: getBlockExplorerUrl(hash),
+      })
+    }
+  }, [isConfirmed, hash, commitmentId, address])
+
+  const selectedChurch = organizations.find(org => org.address === formData.churchAddress)
   const amounts = calculateMonthlyTithe()
 
   return (
@@ -296,47 +245,61 @@ export default function CreateTithe() {
             </div>
 
             {/* Church List */}
-            <div className="space-y-4 max-h-[500px] overflow-y-auto">
-              {filteredChurches.map((church) => (
-                <div
-                  key={church.id}
-                  onClick={() => handleChurchSelect(church)}
-                  className="border border-slate-200 rounded-lg p-6 hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="text-lg font-semibold text-slate-900">{church.name}</h3>
-                        {church.verified && (
-                          <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full flex items-center space-x-1">
-                            <CheckCircle className="w-3 h-3" />
-                            <span>Verified</span>
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-slate-600 text-sm mb-2">{church.location}</p>
-                      <div className="flex items-center space-x-4 text-sm text-slate-500">
-                        <span className="flex items-center space-x-1">
-                          <Church className="w-4 h-4" />
-                          <span>{church.denomination}</span>
-                        </span>
-                        <span className="flex items-center space-x-1">
-                          <Heart className="w-4 h-4" />
-                          <span>{church.membersCount} members</span>
-                        </span>
+            {isLoadingOrgs ? (
+              <div className="text-center py-12">
+                <Loader2 className="w-12 h-12 animate-spin mx-auto text-indigo-600 mb-4" />
+                <p className="text-slate-600">Loading verified organizations...</p>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-4 max-h-[500px] overflow-y-auto">
+                  {filteredChurches.map((org) => (
+                    <div
+                      key={org.address}
+                      onClick={() => handleChurchSelect(org)}
+                      className="border border-slate-200 rounded-lg p-6 hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <h3 className="text-lg font-semibold text-slate-900">{org.name}</h3>
+                            {org.verified ? (
+                              <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full flex items-center space-x-1">
+                                <CheckCircle className="w-3 h-3" />
+                                <span>Verified</span>
+                              </span>
+                            ) : (
+                              <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">
+                                Pending Verification
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-slate-600 text-sm mb-2">{org.description}</p>
+                          <div className="flex items-center space-x-4 text-sm text-slate-500">
+                            <span className="flex items-center space-x-1">
+                              <Church className="w-4 h-4" />
+                              <span className="font-mono text-xs">{org.address.slice(0, 10)}...{org.address.slice(-8)}</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <DollarSign className="w-4 h-4" />
+                              <span>{org.stakeAmount} ETH staked</span>
+                            </span>
+                          </div>
+                        </div>
+                        <ArrowLeft className="w-5 h-5 text-slate-400 transform rotate-180" />
                       </div>
                     </div>
-                    <ArrowLeft className="w-5 h-5 text-slate-400 transform rotate-180" />
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {filteredChurches.length === 0 && (
-              <div className="text-center py-12 text-slate-500">
-                <Church className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>No churches found matching your search.</p>
-              </div>
+                {filteredChurches.length === 0 && !isLoadingOrgs && (
+                  <div className="text-center py-12 text-slate-500">
+                    <Church className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                    <p>No organizations found matching your search.</p>
+                    <p className="text-sm mt-2">Organizations must be registered and verified before they appear here.</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
@@ -657,20 +620,20 @@ export default function CreateTithe() {
               <button
                 type="button"
                 onClick={() => setStep('configure')}
-                disabled={isProcessing}
+                disabled={isWritePending || isConfirming}
                 className="flex-1 px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-all font-medium disabled:opacity-50"
               >
                 Back
               </button>
               <button
                 onClick={handleConfirmCommitment}
-                disabled={isProcessing || !isConnected}
+                disabled={isWritePending || isConfirming || !isConnected}
                 className="flex-1 px-6 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
-                {isProcessing ? (
+                {isWritePending || isConfirming ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Creating Commitment...</span>
+                    <span>{isConfirming ? 'Confirming on chain...' : 'Awaiting wallet...'}</span>
                   </>
                 ) : (
                   <>
@@ -685,6 +648,13 @@ export default function CreateTithe() {
               <p className="text-center text-red-600 text-sm mt-4">
                 Please connect your wallet to confirm your commitment
               </p>
+            )}
+
+            {writeError && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-800 text-sm font-semibold mb-1">Transaction Failed</p>
+                <p className="text-red-700 text-sm">{writeError.message}</p>
+              </div>
             )}
           </div>
         )}
@@ -711,6 +681,19 @@ export default function CreateTithe() {
               <p className="font-mono text-lg text-green-900 text-center font-semibold">
                 {commitmentId}
               </p>
+              {hash && (
+                <div className="mt-4 pt-4 border-t border-green-200">
+                  <p className="text-xs text-green-700 mb-1 text-center">Transaction Hash</p>
+                  <a
+                    href={getBlockExplorerUrl(hash)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs text-green-800 hover:text-green-900 underline block text-center break-all"
+                  >
+                    {hash.slice(0, 20)}...{hash.slice(-10)}
+                  </a>
+                </div>
+              )}
             </div>
 
             {/* Summary */}
@@ -722,17 +705,29 @@ export default function CreateTithe() {
                   <span className="font-semibold text-slate-900">{selectedChurch?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">Monthly Giving:</span>
+                  <span className="text-slate-600">Frequency:</span>
+                  <span className="font-semibold text-slate-900 capitalize">{formData.frequency}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-600">Per Payment:</span>
                   <span className="font-semibold text-indigo-600">
-                    ${amounts.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {amounts.total.toFixed(4)} ETH
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">Annual Total:</span>
-                  <span className="font-semibold text-indigo-600">
-                    ${(amounts.total * 12).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-slate-600">Tithe ({formData.tithePercentage}%):</span>
+                  <span className="font-medium text-slate-700">
+                    {amounts.tithe.toFixed(4)} ETH
                   </span>
                 </div>
+                {parseFloat(formData.offeringPercentage) > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Offering ({formData.offeringPercentage}%):</span>
+                    <span className="font-medium text-slate-700">
+                      {amounts.offering.toFixed(4)} ETH
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -771,7 +766,7 @@ export default function CreateTithe() {
                 onClick={() => {
                   setStep('select')
                   setFormData({
-                    churchId: '',
+                    churchAddress: '',
                     churchName: '',
                     incomeThreshold: '',
                     tithePercentage: '10',
@@ -797,3 +792,4 @@ export default function CreateTithe() {
     </div>
   )
 }
+
