@@ -6,22 +6,23 @@ import OracleABI from '@/abis/StewardOracleRegistry.json'
 import TitheABI from '@/abis/AutomatedTithe.json'
 import MissionABI from '@/abis/MissionProtection.json'
 
-// Base Sepolia contract addresses
+// Base Sepolia contract addresses (LOW STAKES VERSION for testing)
+// Deployed: October 4, 2025
 export const CONTRACTS = {
   trigCore: {
     address: '0x0932b427fce27cAf69b36BAd1C33325835740DE0' as `0x${string}`,
     abi: TrigCoreABI.abi,
   },
   oracle: {
-    address: '0xd17e248f1De95D944c24c8AD5A609A460E7A2a41' as `0x${string}`,
+    address: '0xcc206C0ac32649ba7197Cb93c268e1675eca7024' as `0x${string}`, // ✅ LOW STAKES (0.00001 ETH)
     abi: OracleABI.abi,
   },
   tithe: {
-    address: '0xF13D32355F9B8a9889B5D3C745529f4bf4558E66' as `0x${string}`,
+    address: '0xe4B1318bb19256D2055c194a703824a4B1BA0f27' as `0x${string}`, // ✅ NEW DEPLOYMENT
     abi: TitheABI.abi,
   },
   mission: {
-    address: '0x5a8278171AAfC8477f9Ff9621fe8eB4e2723C50e' as `0x${string}`,
+    address: '0x31C31Bcfa4149132B64b3F00F11EdE1D2e39bE12' as `0x${string}`, // ✅ NEW DEPLOYMENT
     abi: MissionABI.abi,
   },
 } as const
