@@ -16,6 +16,7 @@ import {
   ExternalLink
 } from '@/components/Icons'
 import { WalletConnectButton } from '@/components/WalletConnectButton'
+import { UserMenu } from '@/components/UserMenu'
 import { WalletConnectionCheck } from '@/components/WalletConnectionCheck'
 
 // Types
@@ -162,7 +163,7 @@ export default function ChurchDashboard() {
                 <span className="font-medium">Back to Home</span>
               </Link>
             </div>
-            <WalletConnectButton />
+            {isConnected ? <UserMenu /> : <WalletConnectButton />}
           </div>
         </div>
       </nav>

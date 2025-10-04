@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi'
 import Link from 'next/link'
 import { ArrowLeft, Shield, Plane, CheckCircle, Loader2, Calendar, MapPin, DollarSign, AlertTriangle, Info, Globe, Church, Users } from '@/components/Icons'
 import { WalletConnectButton } from '@/components/WalletConnectButton'
+import { UserMenu } from '@/components/UserMenu'
 import { WalletConnectionCheck } from '@/components/WalletConnectionCheck'
 
 interface ProtectionFormData {
@@ -214,7 +215,7 @@ export default function MissionProtection() {
               Steward
             </span>
           </Link>
-          <WalletConnectButton />
+          {isConnected ? <UserMenu /> : <WalletConnectButton />}
         </nav>
       </header>
 

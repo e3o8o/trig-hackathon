@@ -71,20 +71,11 @@ export function UserMenu() {
       {/* User Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow-md"
+        className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center hover:bg-indigo-200 transition-colors"
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-indigo-600" />
-          </div>
-          <div className="hidden sm:flex items-center space-x-2">
-            <span className="text-sm font-medium text-slate-700">{shortAddress}</span>
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          </div>
-        </div>
-        <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <User className="w-5 h-5 text-indigo-600" />
       </button>
 
       {/* Dropdown Menu */}

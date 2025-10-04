@@ -6,6 +6,7 @@ import { parseEther } from 'viem'
 import Link from 'next/link'
 import { ArrowLeft, Shield, Church, CheckCircle, Loader2 } from '@/components/Icons'
 import { WalletConnectButton } from '@/components/WalletConnectButton'
+import { UserMenu } from '@/components/UserMenu'
 
 interface ChurchFormData {
   name: string
@@ -137,7 +138,7 @@ export default function RegisterChurch() {
               Steward
             </span>
           </div>
-          <WalletConnectButton />
+          {isConnected ? <UserMenu /> : <WalletConnectButton />}
         </nav>
       </header>
 

@@ -16,6 +16,7 @@ import {
   Spinner
 } from '@/components/Icons'
 import { WalletConnectButton } from '@/components/WalletConnectButton'
+import { UserMenu } from '@/components/UserMenu'
 
 // Types
 interface TitheCommitment {
@@ -152,7 +153,7 @@ export default function MyCommitmentsPage() {
               <ArrowLeft className="w-6 h-6 text-slate-600" />
               <span className="text-slate-600">Back to Home</span>
             </Link>
-            <WalletConnectButton />
+            {isConnected ? <UserMenu /> : <WalletConnectButton />}
           </nav>
         </header>
 
@@ -200,7 +201,7 @@ export default function MyCommitmentsPage() {
               >
                 + New Commitment
               </Link>
-              <WalletConnectButton />
+              {isConnected ? <UserMenu /> : <WalletConnectButton />}
             </div>
           </nav>
         </div>

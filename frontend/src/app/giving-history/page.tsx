@@ -2,8 +2,12 @@
 
 import React, { useState, useMemo } from 'react';
 import { useAccount } from 'wagmi';
+import Link from 'next/link';
 import { WalletConnectButton } from '@/components/WalletConnectButton';
+import { UserMenu } from '@/components/UserMenu';
 import {
+  ArrowLeft,
+  Shield,
   Calendar,
   Download,
   ExternalLink,
@@ -393,6 +397,25 @@ export default function GivingHistoryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      {/* Navigation Header */}
+      <header className="container mx-auto px-4 py-6">
+        <nav className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Shield className="w-8 h-8 text-indigo-600" />
+            <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
+              Steward
+            </span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Link href="/" className="flex items-center space-x-2 text-slate-700 hover:text-indigo-600 transition-colors">
+              <ArrowLeft className="w-5 h-5" />
+              <span>Back to Home</span>
+            </Link>
+            {isConnected ? <UserMenu /> : <WalletConnectButton />}
+          </div>
+        </nav>
+      </header>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">

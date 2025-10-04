@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi'
 import Link from 'next/link'
 import { ArrowLeft, Shield, Heart, CheckCircle, Loader2, Church, DollarSign, Calendar } from '@/components/Icons'
 import { WalletConnectButton } from '@/components/WalletConnectButton'
+import { UserMenu } from '@/components/UserMenu'
 
 interface TitheFormData {
   churchId: string
@@ -218,7 +219,7 @@ export default function CreateTithe() {
               Steward
             </span>
           </div>
-          <WalletConnectButton />
+          {isConnected ? <UserMenu /> : <WalletConnectButton />}
         </nav>
       </header>
 
