@@ -543,7 +543,7 @@ export default function MyCommitmentsPage() {
                             <div className="flex items-center justify-between">
                               <span className="text-slate-600">Total Given:</span>
                               <span className="font-bold text-green-600">
-                                {formatCurrency(commitment.totalGiven)}
+                                {formatCurrency((commitment as any).totalGiven || '0')}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
