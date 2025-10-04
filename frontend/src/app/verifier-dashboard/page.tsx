@@ -119,12 +119,24 @@ export default function VerifierDashboard() {
 
   // Handle transaction confirmation
   useEffect(() => {
-    if (isConfirmed) {
+    if (isConfirmed && hash) {
+      console.log('Verification confirmed! Transaction:', hash)
       setProcessingOrgAddress(null)
-      // Reload organizations
-      window.location.reload()
+      
+      // Wait 2 seconds to allow blockchain state to update, then reload
+      setTimeout(() => {
+        window.location.reload()
+      }, 2000)
     }
-  }, [isConfirmed])
+  }, [isConfirmed, hash])
+
+  // Handle transaction errors
+  useEffect(() => {
+    if (writeError) {
+      console.error('Transaction error:', writeError)
+      setProcessingOrgAddress(null)
+    }
+  }, [writeError])
 
   if (!isConnected) {
     return (
@@ -301,13 +313,13 @@ export default function VerifierDashboard() {
                   <div className="mt-4">
                     <button
                       onClick={() => handleVerifyOrganization('0xd591Ea697A2530a45133fFD949ffD8C9bE20706b')}
-                      disabled={isWritePending || isConfirming}
+                      disabled={isWritePending || isConfirming || isConfirmed}
                       className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                     >
-                      {(isWritePending || isConfirming) ? (
+                      {(isWritePending || isConfirming || isConfirmed) ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Verifying...</span>
+                          <span>{isConfirmed ? 'Success! Reloading...' : 'Verifying...'}</span>
                         </>
                       ) : (
                         <>

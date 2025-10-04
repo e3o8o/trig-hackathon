@@ -1,13 +1,21 @@
 'use client'
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
-import { ArrowRight, Shield, Heart, TrendingUp, CheckCircle, Users, Church, Plane } from '@/components/Icons';
+import { ArrowRight, Shield, Heart, TrendingUp, CheckCircle, Users, Church, Plane, X } from '@/components/Icons';
 import { WalletConnectButton } from '@/components/WalletConnectButton';
 import { UserMenu } from '@/components/UserMenu';
 
 export default function Home() {
   const { isConnected } = useAccount();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Hero Section */}
@@ -19,6 +27,8 @@ export default function Home() {
               Steward
             </span>
           </div>
+          
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             {!isConnected && (
               <>
@@ -54,7 +64,97 @@ export default function Home() {
             </Link>
             {isConnected ? <UserMenu /> : <WalletConnectButton />}
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-slate-700 hover:text-indigo-600 transition-colors"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
         </nav>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden mt-4 py-4 bg-white rounded-lg shadow-lg border border-slate-200">
+            <div className="flex flex-col space-y-3 px-4">
+              {!isConnected && (
+                <>
+                  <Link 
+                    href="#features" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-slate-700 hover:text-indigo-600 transition-colors py-2"
+                  >
+                    Features
+                  </Link>
+                  <Link 
+                    href="#how-it-works" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-slate-700 hover:text-indigo-600 transition-colors py-2"
+                  >
+                    How It Works
+                  </Link>
+                  <Link 
+                    href="#for-churches" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-slate-700 hover:text-indigo-600 transition-colors py-2"
+                  >
+                    For Churches
+                  </Link>
+                </>
+              )}
+              {isConnected && (
+                <>
+                  <Link 
+                    href="/mission-protection" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-slate-700 hover:text-indigo-600 transition-colors py-2"
+                  >
+                    Mission Protection
+                  </Link>
+                  <Link 
+                    href="/my-commitments" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-slate-700 hover:text-indigo-600 transition-colors py-2"
+                  >
+                    My Commitments
+                  </Link>
+                  <Link 
+                    href="/giving-history" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-slate-700 hover:text-indigo-600 transition-colors py-2"
+                  >
+                    Giving History
+                  </Link>
+                  <Link 
+                    href="/church-dashboard" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-slate-700 hover:text-indigo-600 transition-colors py-2"
+                  >
+                    Church Dashboard
+                  </Link>
+                </>
+              )}
+              <Link 
+                href="/register-church" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium text-center"
+              >
+                Register Church
+              </Link>
+              <div className="pt-2 border-t border-slate-200">
+                {isConnected ? <UserMenu /> : <WalletConnectButton />}
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Content */}
@@ -62,7 +162,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-100 rounded-full text-indigo-700 text-sm font-medium mb-6">
             <span className="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></span>
-            <span>Powered by Trig Protocol & Blockchain</span>
+            <span>Powered by Trig Protocol</span>
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6 leading-tight">
@@ -313,6 +413,194 @@ export default function Home() {
       </section>
       )}
 
+      {/* FAQ Section */}
+      <section id="faq" className="container mx-auto px-4 py-20">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-slate-600">
+              Everything you need to know about Steward
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {/* FAQ 1 */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <button
+                onClick={() => toggleFaq(0)}
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-slate-900">
+                  How does automated tithing work?
+                </h3>
+                <svg
+                  className={`w-5 h-5 text-slate-600 transition-transform ${openFaqIndex === 0 ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {openFaqIndex === 0 && (
+                <div className="px-6 pb-4">
+                  <p className="text-slate-600">
+                    You set up your commitment once by specifying your church, amount, and frequency. 
+                    Smart contracts then automatically execute your giving based on your schedule—daily, 
+                    weekly, or monthly. You always stay in control and can pause or cancel anytime.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* FAQ 2 */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <button
+                onClick={() => toggleFaq(1)}
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Is my church verified?
+                </h3>
+                <svg
+                  className={`w-5 h-5 text-slate-600 transition-transform ${openFaqIndex === 1 ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {openFaqIndex === 1 && (
+                <div className="px-6 pb-4">
+                  <p className="text-slate-600">
+                    Churches must register and be verified by 3 independent verifiers before receiving 
+                    tithes. This multi-signature system ensures legitimacy without a central authority. 
+                    You can only give to verified organizations.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* FAQ 3 */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <button
+                onClick={() => toggleFaq(2)}
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-slate-900">
+                  How does mission protection work?
+                </h3>
+                <svg
+                  className={`w-5 h-5 text-slate-600 transition-transform ${openFaqIndex === 2 ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {openFaqIndex === 2 && (
+                <div className="px-6 pb-4">
+                  <p className="text-slate-600">
+                    Purchase a policy before your mission trip by specifying your destination, dates, 
+                    and coverage amount. If your trip is disrupted by verifiable events (flight delays, 
+                    natural disasters, etc.), you receive automatic payouts—no claims process required.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* FAQ 4 */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <button
+                onClick={() => toggleFaq(3)}
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-slate-900">
+                  What blockchain does Steward use?
+                </h3>
+                <svg
+                  className={`w-5 h-5 text-slate-600 transition-transform ${openFaqIndex === 3 ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {openFaqIndex === 3 && (
+                <div className="px-6 pb-4">
+                  <p className="text-slate-600">
+                    Steward is deployed on Base Sepolia testnet, a fast and low-cost Ethereum L2 solution. 
+                    All transactions are transparent and verifiable on the blockchain while keeping costs minimal.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* FAQ 5 */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <button
+                onClick={() => toggleFaq(4)}
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-slate-900">
+                  How do I register my church?
+                </h3>
+                <svg
+                  className={`w-5 h-5 text-slate-600 transition-transform ${openFaqIndex === 4 ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {openFaqIndex === 4 && (
+                <div className="px-6 pb-4">
+                  <p className="text-slate-600">
+                    Click "Register Church" in the navigation, fill out your organization details, 
+                    and stake a small amount (0.00001 ETH for testing). Once 3 verifiers approve your 
+                    church, you can start receiving automated tithes from your congregation.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* FAQ 6 */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <button
+                onClick={() => toggleFaq(5)}
+                className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Can I cancel or pause my commitments?
+                </h3>
+                <svg
+                  className={`w-5 h-5 text-slate-600 transition-transform ${openFaqIndex === 5 ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {openFaqIndex === 5 && (
+                <div className="px-6 pb-4">
+                  <p className="text-slate-600">
+                    Yes! You have full control over your commitments. Visit "My Commitments" to pause, 
+                    resume, or cancel at any time. Any unused funds remain in your wallet.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">
@@ -322,16 +610,20 @@ export default function Home() {
           <p className="text-xl text-slate-600 mb-10">
             Join thousands of believers practicing faithful, automated giving.
           </p>
-          <button className="px-10 py-5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-xl hover:shadow-2xl text-lg font-semibold">
+          <Link 
+            href="/register-church"
+            className="inline-block px-10 py-5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-xl hover:shadow-2xl text-lg font-semibold"
+          >
             Get Started Now
-          </button>
+          </Link>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="container mx-auto px-4 py-12 border-t border-slate-200 mt-20">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            {/* Brand */}
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Shield className="w-6 h-6 text-indigo-600" />
@@ -341,33 +633,50 @@ export default function Home() {
                 Biblical stewardship powered by blockchain technology.
               </p>
             </div>
+
+            {/* Quick Links */}
             <div>
-              <h4 className="font-semibold text-slate-900 mb-3">Product</h4>
+              <h4 className="font-semibold text-slate-900 mb-3">Quick Links</h4>
               <ul className="space-y-2 text-sm text-slate-600">
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Features</Link></li>
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Pricing</Link></li>
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">FAQ</Link></li>
+                <li><Link href="#features" className="hover:text-indigo-600 transition-colors">Features</Link></li>
+                <li><Link href="#how-it-works" className="hover:text-indigo-600 transition-colors">How It Works</Link></li>
+                <li><Link href="#faq" className="hover:text-indigo-600 transition-colors">FAQ</Link></li>
+                <li><Link href="/register-church" className="hover:text-indigo-600 transition-colors">Register Church</Link></li>
               </ul>
             </div>
+
+            {/* Resources */}
             <div>
-              <h4 className="font-semibold text-slate-900 mb-3">Company</h4>
+              <h4 className="font-semibold text-slate-900 mb-3">Resources</h4>
               <ul className="space-y-2 text-sm text-slate-600">
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">About</Link></li>
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Blog</Link></li>
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Contact</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-slate-900 mb-3">Legal</h4>
-              <ul className="space-y-2 text-sm text-slate-600">
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Privacy</Link></li>
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Terms</Link></li>
-                <li><Link href="#" className="hover:text-indigo-600 transition-colors">Security</Link></li>
+                <li>
+                  <a 
+                    href="https://github.com/e3o8o/trig-hackathon" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-indigo-600 transition-colors"
+                  >
+                    GitHub
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="https://sepolia.basescan.org" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-indigo-600 transition-colors"
+                  >
+                    Block Explorer
+                  </a>
+                </li>
+                <li><Link href="/verifier-dashboard" className="hover:text-indigo-600 transition-colors">Become a Verifier</Link></li>
+                <li><Link href="/admin" className="hover:text-indigo-600 transition-colors">Admin Panel</Link></li>
               </ul>
             </div>
           </div>
+
           <div className="border-t border-slate-200 pt-8 text-center text-sm text-slate-600">
-            <p>&copy; 2025 Steward. All rights reserved. Built with faith and code.</p>
+            <p>&copy; 2025 Steward. All rights reserved. Built with faith and code. ✨</p>
           </div>
         </div>
       </footer>
