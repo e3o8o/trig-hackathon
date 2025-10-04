@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { parseEther } from 'viem'
 import Link from 'next/link'
@@ -13,10 +13,10 @@ import {
   Award,
   Building,
   CheckCircle,
-  Loader2,
   ExternalLink
 } from '@/components/Icons'
 import { WalletConnectButton } from '@/components/WalletConnectButton'
+import { WalletConnectionCheck } from '@/components/WalletConnectionCheck'
 
 // Types
 interface ChurchLeader {
@@ -96,15 +96,9 @@ const SIMULATED_LEADERS: ChurchLeader[] = [
 
 export default function ChurchDashboard() {
   const { address, isConnected } = useAccount()
-  const [mounted, setMounted] = useState(false)
   const [showAddLeaderModal, setShowAddLeaderModal] = useState(false)
   const [leaders, setLeaders] = useState<ChurchLeader[]>(SIMULATED_LEADERS)
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'pending'>('all')
-  
-  // Fix hydration error by only rendering after client mount
-  useEffect(() => {
-    setMounted(true)
-  }, [])
   
   // Add leader form state
   const [newLeader, setNewLeader] = useState({
@@ -199,8 +193,11 @@ export default function ChurchDashboard() {
           </div>
         </div>
 
-        {/* Church Info Card */}
-        <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 mb-8">
+        {/* Wallet Connection Check */}
+        <WalletConnectionCheck message="Please connect your wallet to view and manage church leaders">
+          <>
+            {/* Church Info Card */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 mb-8">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-center space-x-2">
@@ -311,28 +308,7 @@ export default function ChurchDashboard() {
 
           {/* Leaders List */}
           <div className="p-6">
-            {!mounted ? (
-              <div className="text-center py-12">
-                <Loader2 className="w-16 h-16 text-slate-300 mx-auto mb-4 animate-spin" />
-                <h3 className="text-xl font-bold text-slate-900 mb-2">
-                  Loading...
-                </h3>
-                <p className="text-slate-600">
-                  Checking wallet connection
-                </p>
-              </div>
-            ) : !isConnected ? (
-              <div className="text-center py-12">
-                <Shield className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-slate-900 mb-2">
-                  Connect Your Wallet
-                </h3>
-                <p className="text-slate-600 mb-6">
-                  Please connect your wallet to view and manage church leaders
-                </p>
-                <WalletConnectButton />
-              </div>
-            ) : filteredLeaders.length === 0 ? (
+            {filteredLeaders.length === 0 ? (
               <div className="text-center py-12">
                 <UserCheck className="w-16 h-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-slate-900 mb-2">
@@ -437,6 +413,8 @@ export default function ChurchDashboard() {
             )}
           </div>
         </div>
+          </>
+        </WalletConnectionCheck>
       </div>
 
       {/* Add Leader Modal */}
