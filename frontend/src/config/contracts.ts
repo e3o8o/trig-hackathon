@@ -30,9 +30,10 @@ export const CONTRACTS = {
 export const CHAIN_ID = 84532 // Base Sepolia
 
 // Contract parameters (from deployment)
+// NOTE: Reduced for testing/demo - deployed contracts use 0.1/0.5 ETH
 export const ORACLE_CONFIG = {
-  minOrganizationStake: '0.1', // ETH
-  minVerifierStake: '0.5', // ETH
+  minOrganizationStake: '0.00001', // ETH (reduced for testing)
+  minVerifierStake: '0.00005', // ETH (reduced for testing)
   requiredVerifications: 3,
 } as const
 

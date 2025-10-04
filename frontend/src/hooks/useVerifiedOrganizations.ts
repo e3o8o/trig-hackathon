@@ -38,7 +38,7 @@ export function useVerifiedOrganizations() {
             description: '123 Main St, Dallas, TX | Non-denominational',
             website: 'https://steward.network',
             verified: false, // Will show as "Pending Verification" (org verification requires 3 verifiers)
-            stakeAmount: '0.1',
+            stakeAmount: '0.00001',
           },
           // Additional demo organizations for testing UI
           {
@@ -47,7 +47,7 @@ export function useVerifiedOrganizations() {
             description: 'Austin, TX | Baptist',
             website: 'https://steward.network',
             verified: false,
-            stakeAmount: '0.1',
+            stakeAmount: '0.00001',
           },
           {
             address: '0x0000000000000000000000000000000000000002', // Demo address
@@ -55,7 +55,7 @@ export function useVerifiedOrganizations() {
             description: 'Houston, TX | Pentecostal',
             website: 'https://steward.network',
             verified: false,
-            stakeAmount: '0.1',
+            stakeAmount: '0.00001',
           },
         ]
         
