@@ -396,36 +396,43 @@ export default function GivingHistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      {/* Navigation Header */}
-      <header className="container mx-auto px-4 py-6">
-        <nav className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Shield className="w-8 h-8 text-indigo-600" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
-              Steward
-            </span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link href="/" className="flex items-center space-x-2 text-slate-700 hover:text-indigo-600 transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back to Home</span>
-            </Link>
-            {isConnected ? <UserMenu /> : <WalletConnectButton />}
-          </div>
-        </nav>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200">
+        <div className="container mx-auto px-4 py-6">
+          <nav className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <Link href="/" className="flex items-center space-x-2 text-slate-600 hover:text-slate-900 transition-colors">
+                <ArrowLeft className="w-5 h-5" />
+                <span>Home</span>
+              </Link>
+              <h1 className="text-2xl font-bold text-slate-900">Giving History</h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link 
+                href="/my-commitments" 
+                className="px-4 py-2 text-slate-700 hover:text-indigo-600 transition-colors font-medium"
+              >
+                My Commitments
+              </Link>
+              <Link 
+                href="/create-tithe" 
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+              >
+                + New Commitment
+              </Link>
+              {isConnected ? <UserMenu /> : <WalletConnectButton />}
+            </div>
+          </nav>
+        </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+        {/* Export Buttons */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Giving History</h1>
-              <p className="text-gray-600 mt-1">
-                Complete record of your faithful stewardship
-              </p>
-            </div>
+          <div className="flex justify-end">
             <div className="flex gap-3">
               <button
                 onClick={exportToCSV}
@@ -863,7 +870,8 @@ export default function GivingHistoryPage() {
             )}
           </div>
         )}
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
