@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient } from 'wagmi'
 import Link from 'next/link'
 import { 
   ArrowLeft, 
@@ -30,6 +30,7 @@ interface OrganizationData {
 
 export default function VerifierDashboard() {
   const { address, isConnected } = useAccount()
+  const publicClient = usePublicClient()
   const [organizations, setOrganizations] = useState<OrganizationData[]>([])
   const [isLoadingOrgs, setIsLoadingOrgs] = useState(true)
   const [processingOrgAddress, setProcessingOrgAddress] = useState<string | null>(null)
@@ -61,26 +62,66 @@ export default function VerifierDashboard() {
     functionName: 'requiredVerifications',
   })
 
-  // Query the Test organization info
-  const TEST_ORG_ADDRESS = '0xd591Ea697A2530a45133fFD949ffD8C9bE20706b'
-  const { data: testOrgInfo } = useReadContract({
-    ...CONTRACTS.oracle,
-    functionName: 'getOrganization',
-    args: [TEST_ORG_ADDRESS as `0x${string}`],
-  })
-
   // Transaction hooks
   const { data: hash, isPending: isWritePending, writeContract, error: writeError } = useWriteContract()
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash })
 
-  // Load organizations
+  // Load all organizations
   useEffect(() => {
-    // Simplified: Just mark as loaded
-    // In production, you'd use an indexer/subgraph to load org addresses
-    if (orgCount !== undefined) {
-      setIsLoadingOrgs(false)
+    async function loadOrganizations() {
+      if (!publicClient || !orgCount) return
+      
+      setIsLoadingOrgs(true)
+      try {
+        const count = Number(orgCount)
+        const orgs: OrganizationData[] = []
+        
+        // Loop through all organizations
+        for (let i = 0; i < count; i++) {
+          try {
+            // Get organization address from list
+            const orgAddress = await publicClient.readContract({
+              address: CONTRACTS.oracle.address as `0x${string}`,
+              abi: CONTRACTS.oracle.abi,
+              functionName: 'organizationList',
+              args: [BigInt(i)],
+            }) as `0x${string}`
+            
+            // Get full organization info
+            const orgInfo = await publicClient.readContract({
+              address: CONTRACTS.oracle.address as `0x${string}`,
+              abi: CONTRACTS.oracle.abi,
+              functionName: 'getOrganization',
+              args: [orgAddress],
+            }) as any[]
+            
+            // Parse organization data
+            orgs.push({
+              address: orgAddress,
+              name: orgInfo[0] as string,
+              description: orgInfo[1] as string,
+              website: orgInfo[2] as string,
+              registrationTime: orgInfo[3] as bigint,
+              status: Number(orgInfo[4]),
+              stakeAmount: orgInfo[5] as bigint,
+              reputationScore: orgInfo[6] as bigint,
+              verifierCount: orgInfo[8] as bigint,
+            })
+          } catch (err) {
+            console.error(`Error loading organization ${i}:`, err)
+          }
+        }
+        
+        setOrganizations(orgs)
+      } catch (error) {
+        console.error('Error loading organizations:', error)
+      } finally {
+        setIsLoadingOrgs(false)
+      }
     }
-  }, [orgCount])
+
+    loadOrganizations()
+  }, [publicClient, orgCount])
 
   // Handle verification
   const handleVerifyOrganization = async (orgAddress: string) => {
@@ -265,11 +306,83 @@ export default function VerifierDashboard() {
           </div>
         </div>
 
+        {/* Active Verifiers Section */}
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 mb-8">
+          <div className="p-6 border-b border-slate-200">
+            <h2 className="text-xl font-bold text-slate-900">Active Verifiers</h2>
+            <p className="text-slate-600 mt-1">Addresses authorized to verify organizations</p>
+          </div>
+          <div className="p-6">
+            <div className="space-y-3">
+              {/* Note about verifiers */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Total Verifiers:</strong> 3 active verifiers in the network
+                </p>
+              </div>
+              
+              {/* Known Verifiers List */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Shield className="w-5 h-5 text-indigo-600" />
+                    <div>
+                      <p className="text-sm font-mono text-slate-700">0xd591...706b</p>
+                      <p className="text-xs text-slate-500">Verifier #1 (Deployer)</p>
+                    </div>
+                  </div>
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Active
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Shield className="w-5 h-5 text-indigo-600" />
+                    <div>
+                      <p className="text-sm font-mono text-slate-700">0xd7fb...0f27</p>
+                      <p className="text-xs text-slate-500">Verifier #2</p>
+                    </div>
+                  </div>
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Active
+                  </div>
+                </div>
+
+                {isConnected && address && (
+                  <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-lg border-2 border-indigo-200">
+                    <div className="flex items-center space-x-3">
+                      <Shield className="w-5 h-5 text-indigo-600" />
+                      <div>
+                        <p className="text-sm font-mono text-slate-700">{address.slice(0, 6)}...{address.slice(-4)}</p>
+                        <p className="text-xs text-slate-500">Your Wallet</p>
+                      </div>
+                    </div>
+                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${isVerifier ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                      {isVerifier ? 'Active Verifier' : 'Not a Verifier'}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="mt-4 pt-4 border-t border-slate-200">
+                <Link 
+                  href="/admin"
+                  className="text-sm text-indigo-600 hover:text-indigo-800 flex items-center space-x-1"
+                >
+                  <span>Grant verifier role to new addresses</span>
+                  <span>→</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Organizations List */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200">
           <div className="p-6 border-b border-slate-200">
-            <h2 className="text-xl font-bold text-slate-900">Pending Organizations</h2>
-            <p className="text-slate-600 mt-1">Review and verify registered churches</p>
+            <h2 className="text-xl font-bold text-slate-900">All Organizations</h2>
+            <p className="text-slate-600 mt-1">All registered churches (pending and verified)</p>
           </div>
 
           <div className="p-6">
@@ -278,7 +391,7 @@ export default function VerifierDashboard() {
                 <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-4" />
                 <p className="text-slate-600">Loading organizations...</p>
               </div>
-            ) : orgCount === 0n || orgCount === 0 ? (
+            ) : organizations.length === 0 ? (
               <div className="text-center py-12">
                 <Church className="w-16 h-16 text-slate-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">No Organizations Yet</h3>
@@ -286,67 +399,147 @@ export default function VerifierDashboard() {
                   No churches have registered yet. Check back later!
                 </p>
               </div>
-            ) : testOrgInfo ? (
-              <div className="space-y-4">
-                {/* Organization Card */}
-                <div className="bg-white border border-slate-200 rounded-lg p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-1">
-                        {testOrgInfo[0] || 'Test'}
-                      </h3>
-                      <p className="text-sm text-slate-600 mb-2">
-                        {testOrgInfo[1] || 'Organization'}
-                      </p>
-                      <p className="text-xs text-slate-500 font-mono">
-                        {TEST_ORG_ADDRESS.slice(0, 10)}...{TEST_ORG_ADDRESS.slice(-8)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                        {Number(testOrgInfo[4]) === 0 ? 'PENDING' : 
-                         Number(testOrgInfo[4]) === 1 ? 'VERIFIED' : 
-                         'SUSPENDED'}
-                      </div>
-                      <p className="text-xs text-slate-600 mt-2">
-                        {testOrgInfo[8]?.toString() || '0'}/{requiredVerifications?.toString() || '3'} verifications
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                    <div className="text-sm text-slate-600">
-                      <span className="font-medium">Stake:</span> {testOrgInfo[5] ? (Number(testOrgInfo[5]) / 1e18).toFixed(5) : '0'} ETH
-                    </div>
-                    <button
-                      onClick={() => handleVerifyOrganization(TEST_ORG_ADDRESS)}
-                      disabled={isWritePending || isConfirming || isConfirmed || Number(testOrgInfo[4]) === 1}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                    >
-                      {(isWritePending || isConfirming || isConfirmed) ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>{isConfirmed ? 'Success! Reloading...' : 'Verifying...'}</span>
-                        </>
-                      ) : Number(testOrgInfo[4]) === 1 ? (
-                        <>
-                          <CheckCircle className="w-4 h-4" />
-                          <span>Already Verified</span>
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4" />
-                          <span>Verify Organization</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
             ) : (
-              <div className="text-center py-12">
-                <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-4" />
-                <p className="text-slate-600">Loading organization...</p>
+              <div className="space-y-6">
+                {/* Pending Organizations */}
+                {organizations.filter(org => org.status === 0).length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-3 flex items-center space-x-2">
+                      <Clock className="w-5 h-5 text-yellow-600" />
+                      <span>Pending Verification ({organizations.filter(org => org.status === 0).length})</span>
+                    </h3>
+                    <div className="space-y-4">
+                      {organizations.filter(org => org.status === 0).map((org) => {
+                        const isProcessing = processingOrgAddress === org.address
+                        return (
+                          <div key={org.address} className="bg-white border-2 border-yellow-200 rounded-lg p-6">
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex-1">
+                                <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                                  {org.name || 'Unnamed Organization'}
+                                </h3>
+                                <p className="text-sm text-slate-600 mb-2">
+                                  {org.description || 'No description provided'}
+                                </p>
+                                <p className="text-xs text-slate-500 font-mono">
+                                  {org.address.slice(0, 10)}...{org.address.slice(-8)}
+                                </p>
+                                {org.website && (
+                                  <a 
+                                    href={org.website} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="text-xs text-indigo-600 hover:text-indigo-800 mt-1 inline-block"
+                                  >
+                                    Visit Website →
+                                  </a>
+                                )}
+                              </div>
+                              <div className="text-right ml-4">
+                                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                  PENDING
+                                </div>
+                                <p className="text-xs text-slate-600 mt-2">
+                                  {org.verifierCount.toString()}/{requiredVerifications?.toString() || '3'} verifications
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                              <div className="text-sm text-slate-600 space-y-1">
+                                <div>
+                                  <span className="font-medium">Stake:</span> {(Number(org.stakeAmount) / 1e18).toFixed(5)} ETH
+                                </div>
+                                <div>
+                                  <span className="font-medium">Reputation:</span> {org.reputationScore.toString()}
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => handleVerifyOrganization(org.address)}
+                                disabled={isProcessing}
+                                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                              >
+                                {isProcessing && (isWritePending || isConfirming || isConfirmed) ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>{isConfirmed ? 'Success! Reloading...' : 'Verifying...'}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle className="w-4 h-4" />
+                                    <span>Verify</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Verified Organizations */}
+                {organizations.filter(org => org.status === 1).length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-3 flex items-center space-x-2">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <span>Verified Organizations ({organizations.filter(org => org.status === 1).length})</span>
+                    </h3>
+                    <div className="space-y-4">
+                      {organizations.filter(org => org.status === 1).map((org) => (
+                    <div key={org.address} className="bg-white border-2 border-green-200 rounded-lg p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                            {org.name || 'Unnamed Organization'}
+                          </h3>
+                          <p className="text-sm text-slate-600 mb-2">
+                            {org.description || 'No description provided'}
+                          </p>
+                          <p className="text-xs text-slate-500 font-mono">
+                            {org.address.slice(0, 10)}...{org.address.slice(-8)}
+                          </p>
+                          {org.website && (
+                            <a 
+                              href={org.website} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-xs text-indigo-600 hover:text-indigo-800 mt-1 inline-block"
+                            >
+                              Visit Website →
+                            </a>
+                          )}
+                        </div>
+                        <div className="text-right ml-4">
+                          <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                            ✓ VERIFIED
+                          </div>
+                          <p className="text-xs text-slate-600 mt-2">
+                            {org.verifierCount.toString()}/{requiredVerifications?.toString() || '3'} verifications
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                        <div className="text-sm text-slate-600 space-y-1">
+                          <div>
+                            <span className="font-medium">Stake:</span> {(Number(org.stakeAmount) / 1e18).toFixed(5)} ETH
+                          </div>
+                          <div>
+                            <span className="font-medium">Reputation:</span> {org.reputationScore.toString()}
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2 text-green-600">
+                          <CheckCircle className="w-5 h-5" />
+                          <span className="text-sm font-medium">Fully Verified</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
