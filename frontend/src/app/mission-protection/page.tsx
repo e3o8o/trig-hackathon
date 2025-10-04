@@ -1,12 +1,15 @@
 'use client'
 
-import { useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useState, useEffect } from 'react'
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { parseEther, formatEther } from 'viem'
 import Link from 'next/link'
 import { ArrowLeft, Shield, Plane, CheckCircle, Loader2, Calendar, MapPin, DollarSign, AlertTriangle, Info, Globe, Church, Users } from '@/components/Icons'
 import { WalletConnectButton } from '@/components/WalletConnectButton'
 import { UserMenu } from '@/components/UserMenu'
 import { WalletConnectionCheck } from '@/components/WalletConnectionCheck'
+import { CONTRACTS, getBlockExplorerUrl } from '@/config/contracts'
+import { useVerifiedOrganizations } from '@/hooks/useVerifiedOrganizations'
 
 interface ProtectionFormData {
   destination: string
@@ -127,7 +130,6 @@ export default function MissionProtection() {
   const { address, isConnected } = useAccount()
   const [step, setStep] = useState<'destination' | 'dates' | 'coverage' | 'review' | 'success'>('destination')
   const [policyId, setPolicyId] = useState<string>('')
-  const [isProcessing, setIsProcessing] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   
   const [formData, setFormData] = useState<ProtectionFormData>({
@@ -140,8 +142,51 @@ export default function MissionProtection() {
     churchId: ''
   })
 
+  // Get verified organizations from blockchain
+  const { organizations, isLoading: isLoadingOrgs } = useVerifiedOrganizations()
+  
+  // For demo: use verified orgs if available, fallback to mock
+  const churches = organizations.length > 0 ? organizations.map(org => ({
+    id: org.address,
+    name: org.name,
+    location: org.address.slice(0, 10) + '...',
+    denomination: 'Verified',
+    verified: org.verified
+  })) : VERIFIED_CHURCHES
+
+  // Transaction hooks
+  const { data: hash, isPending: isWritePending, writeContract, error: writeError } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash })
+  
+  const isProcessing = isWritePending || isConfirming
+
+  // Calculate premium from blockchain
+  const { data: blockchainPremium } = useReadContract({
+    ...CONTRACTS.mission,
+    functionName: 'calculatePremium',
+    args: formData.coverageAmount ? [parseEther(formData.coverageAmount)] : undefined,
+    query: {
+      enabled: !!formData.coverageAmount && parseFloat(formData.coverageAmount) > 0,
+    },
+  })
+
+  // Handle transaction confirmation
+  useEffect(() => {
+    if (isConfirmed && hash) {
+      // Policy created! Show success with transaction hash
+      setPolicyId(hash)
+      setStep('success')
+    }
+  }, [isConfirmed, hash])
+
   // Calculate premium based on coverage and destination
   const calculatePremium = () => {
+    // Use blockchain premium if available
+    if (blockchainPremium) {
+      return parseFloat(formatEther(blockchainPremium))
+    }
+
+    // Fallback to local calculation for demo
     if (!formData.coverageAmount || !formData.country || !formData.startDate || !formData.endDate) {
       return 0
     }
@@ -168,17 +213,51 @@ export default function MissionProtection() {
   const coverage = parseFloat(formData.coverageAmount || '0')
 
   const handleSubmit = async () => {
-    setIsProcessing(true)
-    
-    // Simulate blockchain transaction
-    await new Promise(resolve => setTimeout(resolve, 3000))
-    
-    // Generate policy ID
-    const newPolicyId = `POLICY-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
-    setPolicyId(newPolicyId)
-    
-    setIsProcessing(false)
-    setStep('success')
+    if (!address || !isConnected) {
+      alert('Please connect your wallet first')
+      return
+    }
+
+    if (!formData.churchId) {
+      alert('Please select a church')
+      return
+    }
+
+    try {
+      console.log('Purchasing mission protection policy...', {
+        organization: formData.churchId,
+        coverage: formData.coverageAmount,
+        premium: premium,
+        destination: formData.country,
+      })
+
+      // Convert dates to timestamps
+      const startTimestamp = Math.floor(new Date(formData.startDate).getTime() / 1000)
+      const endTimestamp = Math.floor(new Date(formData.endDate).getTime() / 1000)
+
+      // Event type: 0 = MISSION_TRIP
+      const eventType = 0
+
+      writeContract({
+        ...CONTRACTS.mission,
+        functionName: 'purchasePolicy',
+        args: [
+          formData.churchId as `0x${string}`, // organization address
+          eventType, // EventType.MISSION_TRIP
+          `${formData.tripPurpose} to ${formData.destination}`, // eventName
+          `${formData.destination}, ${formData.country}`, // location
+          BigInt(startTimestamp), // startDate
+          BigInt(endTimestamp), // endDate
+          parseEther(formData.coverageAmount), // coverageAmount
+        ],
+        value: parseEther(premium.toString()), // Premium payment in ETH
+      })
+
+      // Transaction will be handled by useEffect when confirmed
+    } catch (error) {
+      console.error('Error purchasing policy:', error)
+      alert('Failed to purchase policy. Please try again.')
+    }
   }
 
   const filteredDestinations = DESTINATIONS.filter(dest =>
@@ -731,10 +810,20 @@ export default function MissionProtection() {
 
               {/* Policy Details Card */}
               <div className="max-w-md mx-auto mb-8 p-6 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl border-2 border-indigo-200">
-                <div className="text-sm text-indigo-600 font-semibold mb-2">Policy ID</div>
-                <div className="font-mono text-lg font-bold text-slate-900 mb-4 break-all">
+                <div className="text-sm text-indigo-600 font-semibold mb-2">Transaction Hash</div>
+                <div className="font-mono text-sm font-bold text-slate-900 mb-2 break-all">
                   {policyId}
                 </div>
+                {hash && (
+                  <a
+                    href={getBlockExplorerUrl(hash)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-indigo-600 hover:text-indigo-700 underline"
+                  >
+                    View on Block Explorer →
+                  </a>
+                )}
                 
                 <div className="grid grid-cols-2 gap-4 text-sm pt-4 border-t border-indigo-200">
                   <div>
