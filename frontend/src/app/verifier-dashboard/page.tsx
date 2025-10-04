@@ -61,39 +61,25 @@ export default function VerifierDashboard() {
     functionName: 'requiredVerifications',
   })
 
+  // Query the Test organization info
+  const TEST_ORG_ADDRESS = '0xd591Ea697A2530a45133fFD949ffD8C9bE20706b'
+  const { data: testOrgInfo } = useReadContract({
+    ...CONTRACTS.oracle,
+    functionName: 'getOrganization',
+    args: [TEST_ORG_ADDRESS as `0x${string}`],
+  })
+
   // Transaction hooks
   const { data: hash, isPending: isWritePending, writeContract, error: writeError } = useWriteContract()
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash })
 
   // Load organizations
   useEffect(() => {
-    async function loadOrganizations() {
-      if (!orgCount) return
-
-      setIsLoadingOrgs(true)
-      try {
-        const orgs: OrganizationData[] = []
-        
-        for (let i = 0; i < Number(orgCount); i++) {
-          // Get organization address from list
-          const orgAddress = await fetch('/api/oracle-list', {
-            method: 'POST',
-            body: JSON.stringify({ index: i })
-          }).then(r => r.json()).catch(() => null)
-          
-          // For now, we'll need to use the contract directly
-          // This is a placeholder - in production you'd use an API or subgraph
-        }
-        
-        setOrganizations(orgs)
-      } catch (error) {
-        console.error('Error loading organizations:', error)
-      } finally {
-        setIsLoadingOrgs(false)
-      }
+    // Simplified: Just mark as loaded
+    // In production, you'd use an indexer/subgraph to load org addresses
+    if (orgCount !== undefined) {
+      setIsLoadingOrgs(false)
     }
-
-    loadOrganizations()
   }, [orgCount])
 
   // Handle verification
@@ -300,20 +286,41 @@ export default function VerifierDashboard() {
                   No churches have registered yet. Check back later!
                 </p>
               </div>
-            ) : (
+            ) : testOrgInfo ? (
               <div className="space-y-4">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <p className="text-sm text-yellow-800">
-                    <strong>Note:</strong> Full organization list will load here. For now, use the contract address directly:
-                    <br />
-                    <code className="text-xs bg-yellow-100 px-2 py-1 rounded mt-2 inline-block">
-                      0xd591Ea697A2530a45133fFD949ffD8C9bE20706b
-                    </code>
-                  </p>
-                  <div className="mt-4">
+                {/* Organization Card */}
+                <div className="bg-white border border-slate-200 rounded-lg p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                        {testOrgInfo[0] || 'Test'}
+                      </h3>
+                      <p className="text-sm text-slate-600 mb-2">
+                        {testOrgInfo[1] || 'Organization'}
+                      </p>
+                      <p className="text-xs text-slate-500 font-mono">
+                        {TEST_ORG_ADDRESS.slice(0, 10)}...{TEST_ORG_ADDRESS.slice(-8)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                        {Number(testOrgInfo[4]) === 0 ? 'PENDING' : 
+                         Number(testOrgInfo[4]) === 1 ? 'VERIFIED' : 
+                         'SUSPENDED'}
+                      </div>
+                      <p className="text-xs text-slate-600 mt-2">
+                        {testOrgInfo[8]?.toString() || '0'}/{requiredVerifications?.toString() || '3'} verifications
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                    <div className="text-sm text-slate-600">
+                      <span className="font-medium">Stake:</span> {testOrgInfo[5] ? (Number(testOrgInfo[5]) / 1e18).toFixed(5) : '0'} ETH
+                    </div>
                     <button
-                      onClick={() => handleVerifyOrganization('0xd591Ea697A2530a45133fFD949ffD8C9bE20706b')}
-                      disabled={isWritePending || isConfirming || isConfirmed}
+                      onClick={() => handleVerifyOrganization(TEST_ORG_ADDRESS)}
+                      disabled={isWritePending || isConfirming || isConfirmed || Number(testOrgInfo[4]) === 1}
                       className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                     >
                       {(isWritePending || isConfirming || isConfirmed) ? (
@@ -321,15 +328,25 @@ export default function VerifierDashboard() {
                           <Loader2 className="w-4 h-4 animate-spin" />
                           <span>{isConfirmed ? 'Success! Reloading...' : 'Verifying...'}</span>
                         </>
+                      ) : Number(testOrgInfo[4]) === 1 ? (
+                        <>
+                          <CheckCircle className="w-4 h-4" />
+                          <span>Already Verified</span>
+                        </>
                       ) : (
                         <>
                           <CheckCircle className="w-4 h-4" />
-                          <span>Verify "Test" Organization</span>
+                          <span>Verify Organization</span>
                         </>
                       )}
                     </button>
                   </div>
                 </div>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-4" />
+                <p className="text-slate-600">Loading organization...</p>
               </div>
             )}
           </div>
