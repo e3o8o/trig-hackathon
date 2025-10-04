@@ -44,6 +44,7 @@ async function main() {
   const addressesToGrant = [
     "0xd591Ea697A2530a45133fFD949ffD8C9bE20706b", // Verifier 1 (deployer)
     "0xd7fb5C170b8Fd6901C041b19698Ded2E7f866c0a", // Verifier 2
+    "0x5D3C9286FB3D6a7116605B1E2F564Aa00C0f97be", // Verifier 3 (new)
   ];
 
   if (addressesToGrant.length === 0) {

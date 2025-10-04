@@ -77,12 +77,12 @@ npx hardhat test
 - [x] Looks good on mobile
 - [x] Looks good on desktop
 
-### **3. Wallet Connection**
-- [ ] Click "Connect Wallet"
-- [ ] Connect MetaMask (Base Sepolia)
-- [ ] Verify address appears in UserMenu
-- [ ] Check balance is shown
-- [ ] Test disconnect function
+### **3. Wallet Connection** ✅
+- [x] Click "Connect Wallet"
+- [x] Connect MetaMask (Base Sepolia)
+- [x] Verify address appears in UserMenu
+- [x] Check balance is shown
+- [x] Test disconnect function
 
 ### **4. Church Registration Flow** (PARTIALLY TESTED ✅)
 - [x] Navigate to `/register-church`

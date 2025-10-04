@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useReadContract } from 'wagmi'
+import { useReadContract, usePublicClient } from 'wagmi'
 import { CONTRACTS } from '@/config/contracts'
 
 export interface Organization {
@@ -15,51 +15,62 @@ export function useVerifiedOrganizations() {
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const publicClient = usePublicClient()
 
-  // For demo purposes, we'll use the event indexer data
-  // In production, you'd query the blockchain directly or use an API
+  // Get organization count
+  const { data: orgCount } = useReadContract({
+    ...CONTRACTS.oracle,
+    functionName: 'getOrganizationCount',
+  })
+
   useEffect(() => {
     async function fetchOrganizations() {
+      if (!publicClient || !orgCount) return
+      
       try {
         setIsLoading(true)
+        const count = Number(orgCount)
+        const orgs: Organization[] = []
         
-        // For now, check if any organizations exist by querying a known address
-        // In a full implementation, you'd:
-        // 1. Use the event indexer API to get all OrganizationRegistered events
-        // 2. Query each organization's details
-        // 3. Filter for verified organizations only
+        // Loop through all organizations
+        for (let i = 0; i < count; i++) {
+          try {
+            // Get organization address from list
+            const orgAddress = await publicClient.readContract({
+              address: CONTRACTS.oracle.address as `0x${string}`,
+              abi: CONTRACTS.oracle.abi,
+              functionName: 'organizationList',
+              args: [BigInt(i)],
+            }) as `0x${string}`
+            
+            // Get full organization info
+            const orgInfo = await publicClient.readContract({
+              address: CONTRACTS.oracle.address as `0x${string}`,
+              abi: CONTRACTS.oracle.abi,
+              functionName: 'getOrganization',
+              args: [orgAddress],
+            }) as any[]
+            
+            // Parse organization data
+            const org: Organization = {
+              address: orgAddress,
+              name: orgInfo[0] as string,
+              description: orgInfo[1] as string,
+              website: orgInfo[2] as string,
+              verified: Number(orgInfo[4]) === 1, // status === VERIFIED
+              stakeAmount: (Number(orgInfo[5]) / 1e18).toFixed(5),
+            }
+            
+            // Only include verified organizations for tithe creation
+            if (org.verified) {
+              orgs.push(org)
+            }
+          } catch (err) {
+            console.error(`Error loading organization ${i}:`, err)
+          }
+        }
         
-        // Temporary: Return demo organizations for testing
-        // These should match any organizations you've registered on Base Sepolia
-        const demoOrgs: Organization[] = [
-          {
-            address: '0xd591Ea697A2530a45133fFD949ffD8C9bE20706b', // Your deployer address
-            name: 'Grace Community Church',
-            description: '123 Main St, Dallas, TX | Non-denominational',
-            website: 'https://steward.network',
-            verified: false, // Will show as "Pending Verification" (org verification requires 3 verifiers)
-            stakeAmount: '0.00001',
-          },
-          // Additional demo organizations for testing UI
-          {
-            address: '0x0000000000000000000000000000000000000001', // Demo address
-            name: 'First Baptist Church',
-            description: 'Austin, TX | Baptist',
-            website: 'https://steward.network',
-            verified: false,
-            stakeAmount: '0.00001',
-          },
-          {
-            address: '0x0000000000000000000000000000000000000002', // Demo address
-            name: 'New Hope Fellowship',
-            description: 'Houston, TX | Pentecostal',
-            website: 'https://steward.network',
-            verified: false,
-            stakeAmount: '0.00001',
-          },
-        ]
-        
-        setOrganizations(demoOrgs)
+        setOrganizations(orgs)
         setError(null)
       } catch (err) {
         console.error('Error fetching organizations:', err)
@@ -70,7 +81,7 @@ export function useVerifiedOrganizations() {
     }
 
     fetchOrganizations()
-  }, [])
+  }, [publicClient, orgCount])
 
   return { organizations, isLoading, error }
 }

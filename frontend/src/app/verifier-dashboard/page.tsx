@@ -34,6 +34,14 @@ export default function VerifierDashboard() {
   const [organizations, setOrganizations] = useState<OrganizationData[]>([])
   const [isLoadingOrgs, setIsLoadingOrgs] = useState(true)
   const [processingOrgAddress, setProcessingOrgAddress] = useState<string | null>(null)
+  const [verifiers, setVerifiers] = useState<Array<{address: string, stake: string, verifications: number, isActive: boolean}>>([])
+  const [isLoadingVerifiers, setIsLoadingVerifiers] = useState(true)
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  // Handle hydration
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
 
   // Check if user is a verifier
   const { data: verifierRole } = useReadContract({
@@ -60,6 +68,12 @@ export default function VerifierDashboard() {
   const { data: requiredVerifications } = useReadContract({
     ...CONTRACTS.oracle,
     functionName: 'requiredVerifications',
+  })
+
+  // Get verifier count
+  const { data: verifierCount } = useReadContract({
+    ...CONTRACTS.oracle,
+    functionName: 'getVerifierCount',
   })
 
   // Transaction hooks
@@ -122,6 +136,95 @@ export default function VerifierDashboard() {
 
     loadOrganizations()
   }, [publicClient, orgCount])
+
+  // Load all verifiers
+  useEffect(() => {
+    async function loadVerifiers() {
+      if (!publicClient || !verifierRole) return
+      
+      setIsLoadingVerifiers(true)
+      try {
+        const count = Number(verifierCount || 0)
+        const verifierList: Array<{address: string, stake: string, verifications: number, isActive: boolean}> = []
+        
+        // If there are verifiers in the list, load them
+        if (count > 0) {
+          for (let i = 0; i < count; i++) {
+            try {
+              // Get verifier address from list
+              const verifierAddress = await publicClient.readContract({
+                address: CONTRACTS.oracle.address as `0x${string}`,
+                abi: CONTRACTS.oracle.abi,
+                functionName: 'verifierList',
+                args: [BigInt(i)],
+              }) as `0x${string}`
+              
+              // Get verifier details
+              const verifierInfo = await publicClient.readContract({
+                address: CONTRACTS.oracle.address as `0x${string}`,
+                abi: CONTRACTS.oracle.abi,
+                functionName: 'getVerifier',
+                args: [verifierAddress],
+              }) as any[]
+              
+              // Parse verifier data
+              verifierList.push({
+                address: verifierAddress,
+                stake: (Number(verifierInfo[0]) / 1e18).toFixed(5),
+                verifications: Number(verifierInfo[1]),
+                isActive: verifierInfo[3]
+              })
+            } catch (err) {
+              console.error(`Error loading verifier ${i}:`, err)
+            }
+          }
+        }
+        
+        // If no verifiers in the list, check for admin-granted verifiers
+        if (verifierList.length === 0) {
+          console.log('No verifiers in verifierList, checking for admin-granted verifiers...')
+          
+          // Known verifier addresses (admin-granted)
+          const knownVerifiers = [
+            '0xd591Ea697A2530a45133fFD949ffD8C9bE20706b',
+            '0xd7fb5C170b8Fd6901C041b19698Ded2E7f866c0a',
+            '0x5D3C9286FB3D6a7116605B1E2F564Aa00C0f97be'
+          ]
+          
+          for (const verifierAddress of knownVerifiers) {
+            try {
+              // Check if they have VERIFIER_ROLE
+              const hasRole = await publicClient.readContract({
+                address: CONTRACTS.oracle.address as `0x${string}`,
+                abi: CONTRACTS.oracle.abi,
+                functionName: 'hasRole',
+                args: [verifierRole, verifierAddress as `0x${string}`],
+              })
+              
+              if (hasRole) {
+                verifierList.push({
+                  address: verifierAddress,
+                  stake: '0.00000', // Admin-granted, no stake
+                  verifications: 0, // Will be updated when they verify
+                  isActive: true
+                })
+              }
+            } catch (err) {
+              console.error(`Error checking verifier ${verifierAddress}:`, err)
+            }
+          }
+        }
+        
+        setVerifiers(verifierList)
+      } catch (error) {
+        console.error('Error loading verifiers:', error)
+      } finally {
+        setIsLoadingVerifiers(false)
+      }
+    }
+
+    loadVerifiers()
+  }, [publicClient, verifierCount, verifierRole])
 
   // Handle verification
   const handleVerifyOrganization = async (orgAddress: string) => {
@@ -198,6 +301,31 @@ export default function VerifierDashboard() {
     )
   }
 
+  // Show loading state during hydration
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <header className="container mx-auto px-4 py-6">
+          <nav className="flex items-center justify-between">
+            <Link href="/" className="flex items-center space-x-2">
+              <Shield className="w-8 h-8 text-indigo-600" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
+                Steward
+              </span>
+            </Link>
+            <div className="w-24 h-10 bg-slate-200 rounded-lg animate-pulse" />
+          </nav>
+        </header>
+        <div className="container mx-auto px-4 py-20">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-4" />
+            <p className="text-slate-600">Loading...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (!isVerifier) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -209,7 +337,7 @@ export default function VerifierDashboard() {
                 Steward
               </span>
             </Link>
-            <UserMenu />
+            {isHydrated ? <UserMenu /> : <div className="w-24 h-10 bg-slate-200 rounded-lg animate-pulse" />}
           </nav>
         </header>
 
@@ -317,53 +445,60 @@ export default function VerifierDashboard() {
               {/* Note about verifiers */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                 <p className="text-sm text-blue-800">
-                  <strong>Total Verifiers:</strong> 3 active verifiers in the network
+                  <strong>Total Verifiers:</strong> {verifiers.length} verifiers in the network
                 </p>
               </div>
               
-              {/* Known Verifiers List */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Shield className="w-5 h-5 text-indigo-600" />
-                    <div>
-                      <p className="text-sm font-mono text-slate-700">0xd591...706b</p>
-                      <p className="text-xs text-slate-500">Verifier #1 (Deployer)</p>
-                    </div>
-                  </div>
-                  <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Active
-                  </div>
+              {/* Dynamic Verifiers List */}
+              {isLoadingVerifiers ? (
+                <div className="text-center py-8">
+                  <Loader2 className="w-6 h-6 text-indigo-600 animate-spin mx-auto mb-2" />
+                  <p className="text-sm text-slate-600">Loading verifiers...</p>
                 </div>
-                
-                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Shield className="w-5 h-5 text-indigo-600" />
-                    <div>
-                      <p className="text-sm font-mono text-slate-700">0xd7fb...0f27</p>
-                      <p className="text-xs text-slate-500">Verifier #2</p>
-                    </div>
-                  </div>
-                  <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Active
-                  </div>
+              ) : verifiers.length === 0 ? (
+                <div className="text-center py-8">
+                  <Shield className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                  <p className="text-sm text-slate-600">No verifiers found</p>
                 </div>
-
-                {isConnected && address && (
-                  <div className="flex items-center justify-between p-3 bg-indigo-50 rounded-lg border-2 border-indigo-200">
-                    <div className="flex items-center space-x-3">
-                      <Shield className="w-5 h-5 text-indigo-600" />
-                      <div>
-                        <p className="text-sm font-mono text-slate-700">{address.slice(0, 6)}...{address.slice(-4)}</p>
-                        <p className="text-xs text-slate-500">Your Wallet</p>
+              ) : (
+                <div className="space-y-2">
+                  {verifiers.map((verifier, index) => {
+                    const isCurrentUser = address && verifier.address.toLowerCase() === address.toLowerCase()
+                    return (
+                      <div 
+                        key={verifier.address} 
+                        className={`flex items-center justify-between p-3 rounded-lg ${
+                          isCurrentUser 
+                            ? 'bg-indigo-50 border-2 border-indigo-200' 
+                            : 'bg-slate-50'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-3">
+                          <Shield className="w-5 h-5 text-indigo-600" />
+                          <div>
+                            <p className="text-sm font-mono text-slate-700">
+                              {verifier.address.slice(0, 6)}...{verifier.address.slice(-4)}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              Verifier #{index + 1} {isCurrentUser ? '(You)' : ''}
+                            </p>
+                            <p className="text-xs text-slate-400">
+                              {verifier.verifications} verifications • {verifier.stake} ETH stake
+                            </p>
+                          </div>
+                        </div>
+                        <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          verifier.isActive 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {verifier.isActive ? 'Active' : 'Inactive'}
+                        </div>
                       </div>
-                    </div>
-                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${isVerifier ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                      {isVerifier ? 'Active Verifier' : 'Not a Verifier'}
-                    </div>
-                  </div>
-                )}
-              </div>
+                    )
+                  })}
+                </div>
+              )}
               
               <div className="mt-4 pt-4 border-t border-slate-200">
                 <Link 

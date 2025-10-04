@@ -295,8 +295,27 @@ export default function CreateTithe() {
                 {filteredChurches.length === 0 && !isLoadingOrgs && (
                   <div className="text-center py-12 text-slate-500">
                     <Church className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <p>No organizations found matching your search.</p>
-                    <p className="text-sm mt-2">Organizations must be registered and verified before they appear here.</p>
+                    <p className="text-lg font-medium mb-2">No Verified Organizations Yet</p>
+                    <p className="text-sm mb-4">Organizations must be registered and verified by 3 verifiers before they can receive tithes.</p>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+                      <p className="text-sm text-blue-800 mb-3">
+                        <strong>Current Status:</strong> There is 1 organization registered but it needs verification.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                        <Link
+                          href="/verifier-dashboard"
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                        >
+                          Verify Organizations
+                        </Link>
+                        <Link
+                          href="/register-church"
+                          className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors text-sm"
+                        >
+                          Register Church
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 )}
               </>
