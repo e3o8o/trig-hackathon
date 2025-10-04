@@ -14,7 +14,7 @@ export default function Home() {
               Steward
             </span>
           </div>
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             <Link href="#features" className="text-slate-700 hover:text-indigo-600 transition-colors">
               Features
             </Link>
@@ -29,6 +29,9 @@ export default function Home() {
             </Link>
             <Link href="/giving-history" className="text-slate-700 hover:text-indigo-600 transition-colors">
               Giving History
+            </Link>
+            <Link href="/church-dashboard" className="text-slate-700 hover:text-indigo-600 transition-colors">
+              Church Dashboard
             </Link>
             <Link href="/register-church" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
               Register Church
