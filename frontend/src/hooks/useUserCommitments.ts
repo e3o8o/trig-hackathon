@@ -39,7 +39,7 @@ export function useUserCommitments() {
   // Fetch details for each commitment
   useEffect(() => {
     async function fetchCommitmentDetails() {
-      if (!commitmentIds || commitmentIds.length === 0) {
+      if (!commitmentIds || (Array.isArray(commitmentIds) && commitmentIds.length === 0)) {
         setCommitments([])
         setIsLoading(false)
         return
@@ -50,7 +50,7 @@ export function useUserCommitments() {
         
         // For demo purposes, if no commitments exist yet, return mock data
         // In production, this would only query real commitments
-        if (commitmentIds.length === 0) {
+        if (Array.isArray(commitmentIds) && commitmentIds.length === 0) {
           // Return empty for now - user can create their first commitment!
           setCommitments([])
         } else {

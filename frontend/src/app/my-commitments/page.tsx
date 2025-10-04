@@ -555,7 +555,7 @@ export default function MyCommitmentsPage() {
                             <div className="flex items-center justify-between">
                               <span className="text-slate-600">Started:</span>
                               <span className="font-semibold text-slate-900">
-                                {formatDate(commitment.createdAt)}
+                                {formatDate(String(commitment.createdAt))}
                               </span>
                             </div>
                           </div>
