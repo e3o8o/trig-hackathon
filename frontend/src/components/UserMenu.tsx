@@ -2,7 +2,8 @@
 
 import { useAccount, useDisconnect } from 'wagmi'
 import { useState, useEffect, useRef } from 'react'
-import { User, ChevronDown, Users } from './Icons'
+import Link from 'next/link'
+import { User, ChevronDown, Users, Shield, Crown } from './Icons'
 
 export function UserMenu() {
   const { address, isConnected } = useAccount()
@@ -97,6 +98,22 @@ export function UserMenu() {
 
           {/* Menu Items */}
           <div className="py-1">
+            <Link
+              href="/verifier-dashboard"
+              onClick={() => setIsOpen(false)}
+              className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center space-x-3"
+            >
+              <Shield className="w-4 h-4 text-slate-500" />
+              <span>Verifier Dashboard</span>
+            </Link>
+            <Link
+              href="/admin"
+              onClick={() => setIsOpen(false)}
+              className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center space-x-3"
+            >
+              <Crown className="w-4 h-4 text-slate-500" />
+              <span>Admin Panel</span>
+            </Link>
             <button
               onClick={copyAddress}
               className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center space-x-3"

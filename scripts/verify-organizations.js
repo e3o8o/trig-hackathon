@@ -14,7 +14,7 @@ async function main() {
   console.log(`🌐 Network: ${network.name} (Chain ID: ${chainId})`);
 
   // Load deployment info
-  const deploymentPath = path.join(__dirname, "..", "deployments", `steward-low-stakes-${network.name}-${chainId}.json`);
+  const deploymentPath = path.join(__dirname, "..", "deployments", `steward-${network.name}-${chainId}.json`);
   if (!fs.existsSync(deploymentPath)) {
     console.error("❌ Deployment file not found");
     process.exit(1);
@@ -40,26 +40,26 @@ async function main() {
     process.exit(1);
   }
 
-  // Get list of organizations
+  // Get count and fetch organizations
   console.log("\n📋 Fetching organizations...");
-  const orgList = await oracle.getOrganizationList();
+  const orgCount = await oracle.getOrganizationCount();
   
-  if (orgList.length === 0) {
+  if (orgCount === 0n || orgCount === 0) {
     console.log("   No organizations registered yet.");
     return;
   }
 
-  console.log(`   Found ${orgList.length} organization(s)\n`);
+  console.log(`   Found ${orgCount.toString()} organization(s)\n`);
 
   // Check each organization
-  for (let i = 0; i < orgList.length; i++) {
-    const orgAddress = orgList[i];
+  for (let i = 0; i < Number(orgCount); i++) {
+    const orgAddress = await oracle.organizationList(i);
     const orgInfo = await oracle.getOrganization(orgAddress);
     
-    // orgInfo structure: [name, description, website, stake, registrationTime, verifierCount, reputationScore, status]
+    // orgInfo structure: [name, description, website, registrationTime, status, stakeAmount, reputationScore, organizationLeaders, verifierCount]
     const name = orgInfo[0];
-    const status = orgInfo[7]; // 0=PENDING, 1=VERIFIED, 2=SUSPENDED, 3=REVOKED
-    const verifierCount = Number(orgInfo[5]);
+    const status = Number(orgInfo[4]); // 0=PENDING, 1=VERIFIED, 2=SUSPENDED, 3=REVOKED
+    const verifierCount = Number(orgInfo[8]);
     const requiredVerifications = Number(await oracle.requiredVerifications());
 
     const statusText = ["PENDING", "VERIFIED", "SUSPENDED", "REVOKED"][status];
@@ -78,8 +78,8 @@ async function main() {
         
         // Check new verification count
         const newOrgInfo = await oracle.getOrganization(orgAddress);
-        const newVerifierCount = Number(newOrgInfo[5]);
-        const newStatus = newOrgInfo[7];
+        const newVerifierCount = Number(newOrgInfo[8]);
+        const newStatus = Number(newOrgInfo[4]);
         
         if (newStatus === 1) {
           console.log(`   🎉 Organization is now FULLY VERIFIED!`);

@@ -14,7 +14,7 @@ async function main() {
   console.log(`🌐 Network: ${network.name} (Chain ID: ${chainId})`);
 
   // Load deployment info
-  const deploymentPath = path.join(__dirname, "..", "deployments", `steward-low-stakes-${network.name}-${chainId}.json`);
+  const deploymentPath = path.join(__dirname, "..", "deployments", `steward-${network.name}-${chainId}.json`);
   if (!fs.existsSync(deploymentPath)) {
     console.error("❌ Deployment file not found");
     process.exit(1);
@@ -39,17 +39,12 @@ async function main() {
   }
 
   // Get addresses to grant role to
-  // For demo, we'll use some test addresses or the deployer can specify
   console.log("\n📝 Addresses to grant VERIFIER_ROLE:");
-  console.log("   (Modify this script to add specific addresses)");
-  console.log();
-
-  // Example: Grant to first 3 Hardhat test accounts
-  const signers = await ethers.getSigners();
+  
   const addressesToGrant = [
-    signers[1]?.address, // Second account
-    signers[2]?.address, // Third account
-  ].filter(Boolean); // Remove undefined
+    "0xd591Ea697A2530a45133fFD949ffD8C9bE20706b", // Verifier 1 (deployer)
+    "0xd7fb5C170b8Fd6901C041b19698Ded2E7f866c0a", // Verifier 2
+  ];
 
   if (addressesToGrant.length === 0) {
     console.log("⚠️  No addresses specified to grant role.");
