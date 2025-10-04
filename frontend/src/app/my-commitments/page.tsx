@@ -439,7 +439,7 @@ export default function MyCommitmentsPage() {
                         {/* Action Buttons */}
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => toggleCommitmentStatus(String(commitment.id), commitment.status)}
+                            onClick={() => toggleCommitmentStatus(String(commitment.id), commitment.status as 'active' | 'paused')}
                             disabled={processingCommitmentId === commitment.id || isWritePending || isConfirming}
                             className={`p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                               isPaused 
