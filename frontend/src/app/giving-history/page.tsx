@@ -50,8 +50,8 @@ interface YearlyStats {
 export default function GivingHistoryPage() {
   const { address, isConnected } = useAccount();
 
-  // State
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  // State - Use static year to avoid hydration mismatch
+  const [selectedYear, setSelectedYear] = useState<number>(2024);
   const [selectedMonth, setSelectedMonth] = useState<number | 'all'>('all');
   const [selectedChurch, setSelectedChurch] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -297,9 +297,10 @@ export default function GivingHistoryPage() {
 
   // Monthly breakdown for charts
   const monthlyBreakdown = useMemo(() => {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const months = Array.from({ length: 12 }, (_, i) => ({
       month: i,
-      name: new Date(2024, i, 1).toLocaleString('default', { month: 'short' }),
+      name: monthNames[i],
       total: 0,
       tithe: 0,
       offering: 0,
@@ -403,22 +404,6 @@ export default function GivingHistoryPage() {
               </p>
             </div>
             <div className="flex gap-3">
-              <button
-                onClick={() => setViewMode(viewMode === 'list' ? 'chart' : 'list')}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                {viewMode === 'list' ? (
-                  <>
-                    <BarChart3 className="w-5 h-5" />
-                    <span>Charts</span>
-                  </>
-                ) : (
-                  <>
-                    <FileText className="w-5 h-5" />
-                    <span>List</span>
-                  </>
-                )}
-              </button>
               <button
                 onClick={exportToCSV}
                 className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -590,9 +575,9 @@ export default function GivingHistoryPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 >
                   <option value="all">All Months</option>
-                  {Array.from({ length: 12 }, (_, i) => (
+                  {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((month, i) => (
                     <option key={i} value={i}>
-                      {new Date(2024, i, 1).toLocaleString('default', { month: 'long' })}
+                      {month}
                     </option>
                   ))}
                 </select>
@@ -632,6 +617,26 @@ export default function GivingHistoryPage() {
                 </div>
               </div>
             </div>
+        </div>
+
+        {/* View Mode Toggle */}
+        <div className="mb-6 flex justify-end">
+          <button
+            onClick={() => setViewMode(viewMode === 'list' ? 'chart' : 'list')}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+          >
+            {viewMode === 'list' ? (
+              <>
+                <BarChart3 className="w-5 h-5" />
+                <span>View Charts</span>
+              </>
+            ) : (
+              <>
+                <FileText className="w-5 h-5" />
+                <span>View List</span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* Chart View */}
