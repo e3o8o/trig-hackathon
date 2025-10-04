@@ -64,11 +64,18 @@ npx hardhat test
 # Status: ✅ DONE (23 tests, 100% pass rate)
 ```
 
-### **2. Frontend Connection**
-- [ ] Open `http://localhost:3000`
-- [ ] Check if site loads correctly
-- [ ] Verify no console errors
-- [ ] Check responsive design (resize window)
+### **2. Frontend Connection** ✅
+- [x] Open `http://localhost:3000`
+- [x] Check if site loads correctly
+- [x] Verify no console errors
+- [x] Check responsive design (resize window)
+- [x] Mobile menu works (Hamburger opens/closes)
+- [x] "Get Started Now" navigates to register-church
+- [x] FAQ section visible and interactive (dropdown/accordion)
+- [x] Footer simplified (no Company/Legal sections)
+- [x] Footer links work (FAQ, GitHub, etc.)
+- [x] Looks good on mobile
+- [x] Looks good on desktop
 
 ### **3. Wallet Connection**
 - [ ] Click "Connect Wallet"
