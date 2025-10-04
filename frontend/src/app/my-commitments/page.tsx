@@ -515,20 +515,20 @@ export default function MyCommitmentsPage() {
                             <div className="flex items-center justify-between">
                               <span className="text-slate-600">Times Executed:</span>
                               <span className="font-semibold text-slate-900">
-                                {commitment.executionCount}
+                                {(commitment as any).executionCount || 0}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-slate-600">Last Executed:</span>
                               <span className="font-semibold text-slate-900">
-                                {commitment.lastExecuted ? formatDate(commitment.lastExecuted) : 'Never'}
+                                {(commitment as any).lastExecuted ? formatDate((commitment as any).lastExecuted) : 'Never'}
                               </span>
                             </div>
-                            {commitment.nextExecution && (
+                            {(commitment as any).nextExecution && (
                               <div className="flex items-center justify-between">
                                 <span className="text-slate-600">Next Expected:</span>
                                 <span className="font-semibold text-indigo-600">
-                                  {formatDate(commitment.nextExecution)}
+                                  {formatDate((commitment as any).nextExecution)}
                                 </span>
                               </div>
                             )}
