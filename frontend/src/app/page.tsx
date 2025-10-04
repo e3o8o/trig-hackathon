@@ -385,50 +385,51 @@ export default function Home() {
       {/* For Churches */}
       {!isConnected && (
         <section id="for-churches" className="container mx-auto px-4 py-20">
-        <div className="max-w-5xl mx-auto bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl p-12 md:p-16 text-white shadow-2xl">
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="flex-1">
-              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/20 rounded-full text-sm font-medium mb-6">
-                <Church className="w-4 h-4" />
-                <span>For Church Leaders</span>
+          <div className="max-w-5xl mx-auto bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl p-12 md:p-16 text-white shadow-2xl">
+            <div className="flex flex-col md:flex-row items-center gap-12">
+              <div className="flex-1">
+                <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/20 rounded-full text-sm font-medium mb-6">
+                  <Church className="w-4 h-4" />
+                  <span>For Church Leaders</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                  Register Your Church Today
+                </h2>
+                <p className="text-xl text-indigo-100 mb-8 leading-relaxed">
+                  Join 150+ churches already using Steward. Enable your congregation to give 
+                  automatically, verify mission protection claims, and provide full financial transparency.
+                </p>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start space-x-3">
+                    <CheckCircle className="w-6 h-6 text-green-300 flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">Receive tithes automatically</span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <CheckCircle className="w-6 h-6 text-green-300 flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">Verify mission trip claims</span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <CheckCircle className="w-6 h-6 text-green-300 flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">Full blockchain transparency</span>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <CheckCircle className="w-6 h-6 text-green-300 flex-shrink-0 mt-0.5" />
+                    <span className="text-lg">Generate giving reports</span>
+                  </li>
+                </ul>
+                <Link href="/register-church" className="inline-block px-8 py-4 bg-white text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all shadow-xl hover:shadow-2xl font-semibold">
+                  Register Your Church
+                </Link>
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Register Your Church Today
-              </h2>
-              <p className="text-xl text-indigo-100 mb-8 leading-relaxed">
-                Join 150+ churches already using Steward. Enable your congregation to give 
-                automatically, verify mission protection claims, and provide full financial transparency.
-              </p>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-6 h-6 text-green-300 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg">Receive tithes automatically</span>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-6 h-6 text-green-300 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg">Verify mission trip claims</span>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-6 h-6 text-green-300 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg">Full blockchain transparency</span>
-                </li>
-                <li className="flex items-start space-x-3">
-                  <CheckCircle className="w-6 h-6 text-green-300 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg">Generate giving reports</span>
-                </li>
-              </ul>
-              <Link href="/register-church" className="inline-block px-8 py-4 bg-white text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all shadow-xl hover:shadow-2xl font-semibold">
-                Register Your Church
-              </Link>
-            </div>
-            <div className="flex-shrink-0">
-              <div className="w-64 h-64 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                <Users className="w-32 h-32 text-white/50" />
+              <div className="flex-shrink-0">
+                <div className="w-64 h-64 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <Users className="w-32 h-32 text-white/50" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* FAQ Section */}
       <section id="faq" className="container mx-auto px-4 py-20">
