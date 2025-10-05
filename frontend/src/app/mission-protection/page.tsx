@@ -11,6 +11,9 @@ import { WalletConnectionCheck } from '@/components/WalletConnectionCheck'
 import { CONTRACTS, getBlockExplorerUrl } from '@/config/contracts'
 import { useVerifiedOrganizations } from '@/hooks/useVerifiedOrganizations'
 
+// ETH to USD conversion rate (same as other pages)
+const ETH_TO_USD = 4608.59
+
 interface ProtectionFormData {
   destination: string
   country: string
@@ -29,58 +32,59 @@ interface ProtectionFormData {
 //   functionName: 'getVerifiedChurches'
 // })
 // This static list is for demo/development purposes only
+// Using valid Ethereum addresses for testing
 const VERIFIED_CHURCHES = [
   {
-    id: 'CHURCH-001',
+    id: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1',
     name: 'Grace Community Church',
     location: 'Dallas, TX',
     denomination: 'Non-denominational',
     verified: true
   },
   {
-    id: 'CHURCH-002',
+    id: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
     name: 'First Baptist Church',
     location: 'Austin, TX',
     denomination: 'Baptist',
     verified: true
   },
   {
-    id: 'CHURCH-003',
+    id: '0x1F98431c8aD98523631AE4a59f267346ea31F984',
     name: 'New Hope Fellowship',
     location: 'Houston, TX',
     denomination: 'Pentecostal',
     verified: true
   },
   {
-    id: 'CHURCH-004',
+    id: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
     name: 'Covenant Presbyterian Church',
     location: 'San Antonio, TX',
     denomination: 'Presbyterian',
     verified: true
   },
   {
-    id: 'CHURCH-005',
+    id: '0xE592427A0AEce92De3Edee1F18E0157C05861564',
     name: 'Living Word Church',
     location: 'Fort Worth, TX',
     denomination: 'Non-denominational',
     verified: true
   },
   {
-    id: 'CHURCH-006',
+    id: '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45',
     name: 'St. Michael\'s Catholic Church',
     location: 'Dallas, TX',
     denomination: 'Catholic',
     verified: true
   },
   {
-    id: 'CHURCH-007',
+    id: '0xC36442b4a4522E871399CD717aBDD847Ab11FE88',
     name: 'Christ the King Lutheran',
     location: 'Plano, TX',
     denomination: 'Lutheran',
     verified: true
   },
   {
-    id: 'CHURCH-008',
+    id: '0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6',
     name: 'Cornerstone Assembly',
     location: 'Irving, TX',
     denomination: 'Assemblies of God',
@@ -108,6 +112,7 @@ const DESTINATIONS = [
 ]
 
 const COVERAGE_OPTIONS = [
+  { value: '50', label: '$50 - Demo Protection (~$1 premium) 🎯' },
   { value: '1000', label: '$1,000 - Basic Protection' },
   { value: '2000', label: '$2,000 - Standard Protection' },
   { value: '3000', label: '$3,000 - Enhanced Protection' },
@@ -131,6 +136,7 @@ export default function MissionProtection() {
   const [step, setStep] = useState<'destination' | 'dates' | 'coverage' | 'review' | 'success'>('destination')
   const [policyId, setPolicyId] = useState<string>('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [isHydrated, setIsHydrated] = useState(false)
   
   const [formData, setFormData] = useState<ProtectionFormData>({
     destination: '',
@@ -141,6 +147,11 @@ export default function MissionProtection() {
     tripPurpose: '',
     churchId: ''
   })
+
+  // Hydration effect
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
 
   // Get verified organizations from blockchain
   const { organizations, isLoading: isLoadingOrgs } = useVerifiedOrganizations()
@@ -160,15 +171,25 @@ export default function MissionProtection() {
   
   const isProcessing = isWritePending || isConfirming
 
-  // Calculate premium from blockchain
-  const { data: blockchainPremium } = useReadContract({
+  // Calculate coverage in ETH for contract calls
+  const coverageUSD = parseFloat(formData.coverageAmount || '0')
+  const coverageETH = coverageUSD > 0 ? coverageUSD / ETH_TO_USD : 0
+
+  // Fetch exact premium from contract to ensure it matches
+  const { data: contractPremium } = useReadContract({
     ...CONTRACTS.mission,
     functionName: 'calculatePremium',
-    args: formData.coverageAmount ? [parseEther(formData.coverageAmount)] : undefined,
+    args: coverageETH > 0 ? [parseEther(coverageETH.toString())] : undefined,
     query: {
-      enabled: !!formData.coverageAmount && parseFloat(formData.coverageAmount) > 0,
+      enabled: coverageETH > 0,
     },
   })
+
+  // Use contract's premium calculation (guaranteed to match)
+  const premiumETH = contractPremium && typeof contractPremium === 'bigint' 
+    ? parseFloat(formatEther(contractPremium)) 
+    : 0
+  const premiumUSD = premiumETH * ETH_TO_USD
 
   // Handle transaction confirmation
   useEffect(() => {
@@ -179,38 +200,13 @@ export default function MissionProtection() {
     }
   }, [isConfirmed, hash])
 
-  // Calculate premium based on coverage and destination
-  const calculatePremium = () => {
-     // Use blockchain premium if available
-    if (blockchainPremium && typeof blockchainPremium === 'bigint') {
-      return parseFloat(formatEther(blockchainPremium))
+  // Display transaction errors
+  useEffect(() => {
+    if (writeError) {
+      console.error('Transaction error:', writeError)
+      alert(`Transaction failed: ${writeError.message || 'Unknown error'}`)
     }
-
-    // Fallback to local calculation for demo
-    if (!formData.coverageAmount || !formData.country || !formData.startDate || !formData.endDate) {
-      return 0
-    }
-
-    const destination = DESTINATIONS.find(d => d.country === formData.country)
-    if (!destination) return 0
-
-    const coverage = parseFloat(formData.coverageAmount)
-    const start = new Date(formData.startDate)
-    const end = new Date(formData.endDate)
-    const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-    
-    // Base premium: coverage amount * risk rate
-    let premium = coverage * destination.baseRate
-    
-    // Adjust for trip duration (longer trips = higher risk)
-    const durationMultiplier = 1 + (days / 365) * 0.5 // +50% per year
-    premium *= durationMultiplier
-    
-    return Math.round(premium)
-  }
-
-  const premium = calculatePremium()
-  const coverage = parseFloat(formData.coverageAmount || '0')
+  }, [writeError])
 
   const handleSubmit = async () => {
     if (!address || !isConnected) {
@@ -226,9 +222,13 @@ export default function MissionProtection() {
     try {
       console.log('Purchasing mission protection policy...', {
         organization: formData.churchId,
-        coverage: formData.coverageAmount,
-        premium: premium,
+        coverageUSD: coverageUSD,
+        coverageETH: coverageETH,
+        premiumUSD: premiumUSD,
+        premiumETH: premiumETH,
+        premiumFromContract: contractPremium ? formatEther(contractPremium as bigint) : 'N/A',
         destination: formData.country,
+        note: 'Premium fetched directly from contract to ensure exact match',
       })
 
       // Convert dates to timestamps
@@ -248,9 +248,10 @@ export default function MissionProtection() {
           `${formData.destination}, ${formData.country}`, // location
           BigInt(startTimestamp), // startDate
           BigInt(endTimestamp), // endDate
-          parseEther(formData.coverageAmount), // coverageAmount
+          parseEther(coverageETH.toString()), // coverageAmount in ETH
+          '0x0000000000000000000000000000000000000000', // coverageToken (ETH)
         ],
-        value: parseEther(premium.toString()), // Premium payment in ETH
+        value: parseEther(premiumETH.toString()), // Premium payment in ETH
       })
 
       // Transaction will be handled by useEffect when confirmed
@@ -294,7 +295,7 @@ export default function MissionProtection() {
               Steward
             </span>
           </Link>
-          {isConnected ? <UserMenu /> : <WalletConnectButton />}
+          {isHydrated && (isConnected ? <UserMenu /> : <WalletConnectButton />)}
         </nav>
       </header>
 
@@ -521,7 +522,7 @@ export default function MissionProtection() {
                     required
                   >
                     <option value="">Select your church...</option>
-                    {VERIFIED_CHURCHES.map((church) => (
+                    {churches.map((church) => (
                       <option key={church.id} value={church.id}>
                         {church.name} - {church.location}
                       </option>
@@ -688,7 +689,7 @@ export default function MissionProtection() {
                     <div className="col-span-2">
                       <span className="text-slate-600">Registered Church:</span>
                       <div className="font-semibold text-slate-900 flex items-center gap-2">
-                        {VERIFIED_CHURCHES.find(c => c.id === formData.churchId)?.name || 'Not selected'}
+                        {churches.find(c => c.id === formData.churchId)?.name || 'Not selected'}
                         {formData.churchId && (
                           <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full flex items-center gap-1">
                             <CheckCircle className="w-3 h-3" />
@@ -710,14 +711,18 @@ export default function MissionProtection() {
                     <div className="flex justify-between items-center">
                       <span className="text-indigo-700">Coverage Amount:</span>
                       <span className="text-2xl font-bold text-indigo-900">
-                        ${coverage.toLocaleString()}
+                        ${coverageUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between items-center pt-3 border-t border-indigo-200">
                       <span className="text-indigo-700">Premium Payment:</span>
                       <span className="text-2xl font-bold text-indigo-900">
-                        ${premium.toLocaleString()}
+                        ${premiumUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs text-indigo-600 pt-2">
+                      <span>≈ {premiumETH.toFixed(6)} ETH</span>
+                      <span className="text-indigo-500">@ ${ETH_TO_USD.toLocaleString()} per ETH</span>
                     </div>
                   </div>
                 </div>
@@ -785,7 +790,7 @@ export default function MissionProtection() {
                   ) : (
                     <>
                       <DollarSign className="w-5 h-5" />
-                      <span>Pay ${premium.toLocaleString()} & Purchase Policy</span>
+                      <span>Pay ${premiumUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} & Purchase Policy</span>
                     </>
                   )}
                 </button>
@@ -828,11 +833,11 @@ export default function MissionProtection() {
                 <div className="grid grid-cols-2 gap-4 text-sm pt-4 border-t border-indigo-200">
                   <div>
                     <div className="text-slate-600">Coverage</div>
-                    <div className="font-bold text-slate-900">${coverage.toLocaleString()}</div>
+                    <div className="font-bold text-slate-900">${coverageUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                   </div>
                   <div>
                     <div className="text-slate-600">Premium Paid</div>
-                    <div className="font-bold text-slate-900">${premium.toLocaleString()}</div>
+                    <div className="font-bold text-slate-900">${premiumUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                   </div>
                   <div>
                     <div className="text-slate-600">Destination</div>
