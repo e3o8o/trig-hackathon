@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react'
-import { useReadContract, useAccount } from 'wagmi'
+import { useReadContract, useAccount, usePublicClient } from 'wagmi'
 import { CONTRACTS, FREQUENCY_LABELS } from '@/config/contracts'
+import { formatEther } from 'viem'
+
+interface OrganizationInfo {
+  name: string
+  description: string
+  website: string
+}
 
 export interface Commitment {
   id: number
@@ -20,8 +27,11 @@ export interface Commitment {
   paymentsCount: number
 }
 
+const STATUS_LABELS = ['active', 'paused', 'cancelled', 'completed']
+
 export function useUserCommitments() {
   const { address } = useAccount()
+  const publicClient = usePublicClient()
   const [commitments, setCommitments] = useState<Commitment[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
@@ -48,17 +58,90 @@ export function useUserCommitments() {
       try {
         setIsLoading(true)
         
-        // For demo purposes, if no commitments exist yet, return mock data
-        // In production, this would only query real commitments
-        if (Array.isArray(commitmentIds) && commitmentIds.length === 0) {
-          // Return empty for now - user can create their first commitment!
-          setCommitments([])
-        } else {
-          // TODO: Batch query all commitments
-          // For now, returning empty until user creates real commitments
-          setCommitments([])
-        }
+        const ids = commitmentIds as bigint[]
+        console.log('Fetching details for commitment IDs:', ids)
         
+        if (ids.length === 0) {
+          setCommitments([])
+          setIsLoading(false)
+          return
+        }
+
+        // Fetch details for each commitment
+        const commitmentPromises = ids.map(async (id) => {
+          try {
+            const result = await publicClient?.readContract({
+              ...CONTRACTS.tithe,
+              functionName: 'getCommitment',
+              args: [id],
+            })
+
+            if (!result) return null
+
+            // Parse the tuple returned by getCommitment
+            const [
+              giver,
+              organization,
+              amount,
+              token,
+              frequency,
+              startTime,
+              endTime,
+              lastPaymentTime,
+              totalPaid,
+              paymentCount,
+              status
+            ] = result as any[]
+
+            // Fetch organization details from oracle registry
+            let orgName = organization as string
+            let orgDescription = ''
+            
+            try {
+              const orgInfo = await publicClient?.readContract({
+                ...CONTRACTS.oracle,
+                functionName: 'getOrganization',
+                args: [organization as `0x${string}`],
+              }) as any[]
+              
+              if (orgInfo && orgInfo.length > 0) {
+                orgName = orgInfo[0] as string || organization as string
+                orgDescription = orgInfo[1] as string || ''
+              }
+            } catch (err) {
+              console.log(`Could not fetch org details for ${organization}, using address`)
+            }
+
+            const commitmentData: Commitment = {
+              id: Number(id),
+              organizationAddress: organization as string,
+              organizationName: orgName,
+              amount: formatEther(amount as bigint),
+              token: token as string,
+              frequency: Number(frequency),
+              frequencyLabel: FREQUENCY_LABELS[Number(frequency) as keyof typeof FREQUENCY_LABELS] || 'Unknown',
+              status: Number(status),
+              statusLabel: STATUS_LABELS[Number(status)] || 'unknown',
+              createdAt: Number(startTime),
+              lastPayment: Number(lastPaymentTime),
+              nextPayment: 0, // TODO: Calculate based on frequency
+              endTime: Number(endTime),
+              totalPaid: formatEther(totalPaid as bigint),
+              paymentsCount: Number(paymentCount),
+            }
+
+            return commitmentData
+          } catch (err) {
+            console.error(`Error fetching commitment ${id}:`, err)
+            return null
+          }
+        })
+
+        const fetchedCommitments = await Promise.all(commitmentPromises)
+        const validCommitments = fetchedCommitments.filter((c): c is Commitment => c !== null)
+        
+        console.log('Fetched commitments:', validCommitments)
+        setCommitments(validCommitments)
         setError(null)
       } catch (err) {
         console.error('Error fetching commitment details:', err)
@@ -69,7 +152,7 @@ export function useUserCommitments() {
     }
 
     fetchCommitmentDetails()
-  }, [commitmentIds])
+  }, [commitmentIds, publicClient])
 
   return { 
     commitments, 

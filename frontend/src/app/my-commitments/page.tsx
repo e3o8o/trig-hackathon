@@ -75,6 +75,9 @@ const SIMULATED_COMMITMENTS: TitheCommitment[] = [
   }
 ]
 
+// ETH/USD conversion rate (same as create-tithe page)
+const ETH_TO_USD = 4608.59
+
 export default function MyCommitmentsPage() {
   const { address, isConnected } = useAccount()
   
@@ -88,8 +91,40 @@ export default function MyCommitmentsPage() {
   const [processingCommitmentId, setProcessingCommitmentId] = useState<string | null>(null)
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
 
+  // Transform blockchain commitments to page format
+  const transformedCommitments = blockchainCommitments.map((bc) => {
+    // Convert ETH amounts back to USD for display
+    const amountETH = parseFloat(bc.amount)
+    const amountUSD = amountETH * ETH_TO_USD
+    const totalPaidETH = parseFloat(bc.totalPaid)
+    const totalPaidUSD = totalPaidETH * ETH_TO_USD
+    
+    // Format location - use shortened address if no other location info
+    const formatAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`
+    const churchLocation = bc.organizationName === bc.organizationAddress 
+      ? formatAddress(bc.organizationAddress) 
+      : formatAddress(bc.organizationAddress)
+    
+    return {
+      id: String(bc.id),
+      churchId: bc.organizationAddress,
+      churchName: bc.organizationName,
+      churchLocation: churchLocation,
+      incomeThreshold: amountUSD.toString(), // Convert ETH back to USD
+      tithePercentage: '10', // Fixed for display purposes
+      offeringPercentage: '0',
+      frequency: bc.frequencyLabel.toLowerCase(),
+      status: bc.statusLabel as 'active' | 'paused',
+      createdAt: new Date(bc.createdAt * 1000).toISOString().split('T')[0],
+      lastExecuted: bc.lastPayment > 0 ? new Date(bc.lastPayment * 1000).toISOString().split('T')[0] : null,
+      nextExecution: null, // TODO: Calculate based on frequency
+      totalGiven: totalPaidUSD.toString(), // Convert ETH back to USD
+      executionCount: bc.paymentsCount,
+    }
+  })
+
   // For demo: show mock data if no real commitments yet
-  const commitments = hasCommitments ? blockchainCommitments : (isConnected ? SIMULATED_COMMITMENTS : [])
+  const commitments = hasCommitments ? transformedCommitments : (isConnected ? SIMULATED_COMMITMENTS : [])
 
   // Handle transaction confirmation
   useEffect(() => {
@@ -106,15 +141,16 @@ export default function MyCommitmentsPage() {
 
   // Calculate totals
   const calculateCommitmentTotals = (commitment: TitheCommitment) => {
-    const income = parseFloat(commitment.incomeThreshold)
-    const tithe = (income * parseFloat(commitment.tithePercentage)) / 100
-    const offering = (income * parseFloat(commitment.offeringPercentage)) / 100
+    // incomeThreshold now contains the total commitment amount in USD
+    const totalAmount = parseFloat(commitment.incomeThreshold)
+    const tithe = (totalAmount * parseFloat(commitment.tithePercentage)) / (parseFloat(commitment.tithePercentage) + parseFloat(commitment.offeringPercentage))
+    const offering = (totalAmount * parseFloat(commitment.offeringPercentage)) / (parseFloat(commitment.tithePercentage) + parseFloat(commitment.offeringPercentage))
     return {
-      tithe,
-      offering,
-      total: tithe + offering,
-      monthly: tithe + offering,
-      yearly: (tithe + offering) * 12
+      tithe: isNaN(tithe) ? totalAmount : tithe,
+      offering: isNaN(offering) ? 0 : offering,
+      total: totalAmount,
+      monthly: totalAmount,
+      yearly: totalAmount * 12
     }
   }
 
@@ -123,8 +159,8 @@ export default function MyCommitmentsPage() {
     try {
       setProcessingCommitmentId(commitmentId)
       
-      // Extract numeric ID from string (e.g., "TITHE-1728234567890" -> parse as number)
-      const numericId = parseInt(commitmentId.split('-')[1] || commitmentId)
+      // Convert string ID to number (blockchain commitments use numeric IDs)
+      const numericId = parseInt(commitmentId, 10)
       
       console.log('Pausing commitment:', numericId)
       
@@ -144,8 +180,8 @@ export default function MyCommitmentsPage() {
     try {
       setProcessingCommitmentId(commitmentId)
       
-      // Extract numeric ID from string
-      const numericId = parseInt(commitmentId.split('-')[1] || commitmentId)
+      // Convert string ID to number
+      const numericId = parseInt(commitmentId, 10)
       
       console.log('Resuming commitment:', numericId)
       
