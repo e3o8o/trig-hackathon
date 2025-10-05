@@ -66,6 +66,7 @@ export default function MyProtections() {
   const [claimAmount, setClaimAmount] = useState('')
   const [claimReason, setClaimReason] = useState('')
   const [isHydrated, setIsHydrated] = useState(false)
+  const [refetchKey, setRefetchKey] = useState(0)
 
   // Hydration effect
   useEffect(() => {
@@ -136,13 +137,14 @@ export default function MyProtections() {
     }
 
     fetchPolicies()
-  }, [policyIds, publicClient])
+  }, [policyIds, publicClient, refetchKey])
 
   // Handle transaction confirmation
   useEffect(() => {
     if (isConfirmed && hash) {
       // Refresh policies after successful transaction
       refetchPolicyIds()
+      setRefetchKey(prev => prev + 1)
       setShowClaimModal(false)
       setShowCancelModal(false)
       setSelectedPolicy(null)
