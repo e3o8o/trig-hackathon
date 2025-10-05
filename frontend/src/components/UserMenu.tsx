@@ -107,6 +107,14 @@ export function UserMenu() {
               <span>My Protections</span>
             </Link>
             <Link
+              href="/my-commitments"
+              onClick={() => setIsOpen(false)}
+              className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center space-x-3"
+            >
+              <Shield className="w-4 h-4 text-slate-500" />
+              <span>My Commitments</span>
+            </Link>
+            <Link
               href="/verifier-dashboard"
               onClick={() => setIsOpen(false)}
               className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center space-x-3"
