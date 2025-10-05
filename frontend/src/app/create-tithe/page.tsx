@@ -27,6 +27,9 @@ const FREQUENCIES = [
   { value: 'yearly', label: 'Yearly (annual tithe)' }
 ]
 
+// ETH/USD conversion rate
+const ETH_TO_USD = 4608.59
+
 export default function CreateTithe() {
   const { address, isConnected } = useAccount()
   const [step, setStep] = useState<'select' | 'configure' | 'preview' | 'success'>('select')
@@ -88,12 +91,22 @@ export default function CreateTithe() {
 
   const calculateMonthlyTithe = () => {
     const income = parseFloat(formData.incomeThreshold) || 0
-    const tithe = (income * parseFloat(formData.tithePercentage)) / 100
-    const offering = (income * parseFloat(formData.offeringPercentage)) / 100
+    const titheUSD = (income * parseFloat(formData.tithePercentage)) / 100
+    const offeringUSD = (income * parseFloat(formData.offeringPercentage)) / 100
+    const totalUSD = titheUSD + offeringUSD
+    
+    // Convert USD to ETH
+    const titheETH = titheUSD / ETH_TO_USD
+    const offeringETH = offeringUSD / ETH_TO_USD
+    const totalETH = totalUSD / ETH_TO_USD
+    
     return {
-      tithe,
-      offering,
-      total: tithe + offering
+      tithe: titheUSD,
+      offering: offeringUSD,
+      total: totalUSD,
+      titheETH,
+      offeringETH,
+      totalETH
     }
   }
 
@@ -105,14 +118,15 @@ export default function CreateTithe() {
 
     try {
       const amounts = calculateMonthlyTithe()
-      const totalAmount = amounts.total.toString()
+      const totalAmountETH = amounts.totalETH.toString()
       
       // Map frequency string to enum
       const frequencyEnum = FREQUENCY_ENUM[formData.frequency.toUpperCase() as keyof typeof FREQUENCY_ENUM]
       
       console.log('Creating commitment:', {
         organization: formData.churchAddress,
-        amount: totalAmount + ' ETH',
+        amountUSD: amounts.total + ' USD',
+        amountETH: totalAmountETH + ' ETH',
         frequency: formData.frequency,
         frequencyEnum,
       })
@@ -123,12 +137,12 @@ export default function CreateTithe() {
         functionName: 'createCommitment',
         args: [
           formData.churchAddress as `0x${string}`, // organization address
-          parseEther(totalAmount), // total tithe + offering amount
+          parseEther(totalAmountETH), // total tithe + offering amount in ETH
           '0x0000000000000000000000000000000000000000' as `0x${string}`, // ETH (zero address)
           frequencyEnum, // frequency enum
           0, // no end time
         ],
-        value: parseEther(totalAmount), // First payment
+        value: parseEther(totalAmountETH), // First payment in ETH
       })
     } catch (error) {
       console.error('Commitment creation error:', error)
@@ -357,6 +371,17 @@ export default function CreateTithe() {
             </div>
 
             <form onSubmit={handleConfigure} className="space-y-6">
+              {/* Conversion Rate Info */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start space-x-2">
+                  <DollarSign className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div className="text-sm text-blue-800">
+                    <strong>Conversion Rate:</strong> 1 ETH = ${ETH_TO_USD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
+                    <div className="text-xs text-blue-700 mt-1">Your USD amounts will be converted to ETH for blockchain transactions</div>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label htmlFor="incomeThreshold" className="block text-sm font-medium text-slate-700 mb-2">
                   Monthly Income Threshold (USD) *
@@ -469,23 +494,38 @@ export default function CreateTithe() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-600">Tithe ({formData.tithePercentage}%):</span>
-                      <span className="font-semibold text-indigo-600">
-                        ${amounts.tithe.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
+                      <div className="text-right">
+                        <div className="font-semibold text-indigo-600">
+                          ${amounts.tithe.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {amounts.titheETH.toFixed(6)} ETH
+                        </div>
+                      </div>
                     </div>
                     {parseFloat(formData.offeringPercentage) > 0 && (
                       <div className="flex justify-between">
                         <span className="text-slate-600">Offering ({formData.offeringPercentage}%):</span>
-                        <span className="font-semibold text-indigo-600">
-                          ${amounts.offering.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
+                        <div className="text-right">
+                          <div className="font-semibold text-indigo-600">
+                            ${amounts.offering.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {amounts.offeringETH.toFixed(6)} ETH
+                          </div>
+                        </div>
                       </div>
                     )}
                     <div className="flex justify-between pt-2 border-t border-slate-300">
                       <span className="font-semibold text-slate-900">Total Giving:</span>
-                      <span className="font-bold text-indigo-600 text-lg">
-                        ${amounts.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
+                      <div className="text-right">
+                        <div className="font-bold text-indigo-600 text-lg">
+                          ${amounts.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                        <div className="text-sm text-slate-600 font-semibold">
+                          {amounts.totalETH.toFixed(6)} ETH
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -591,27 +631,43 @@ export default function CreateTithe() {
                 <div className="space-y-3">
                   <div className="flex justify-between text-lg">
                     <span className="text-indigo-700">Tithe to Church:</span>
-                    <span className="font-bold text-indigo-900">
-                      ${amounts.tithe.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </span>
+                    <div className="text-right">
+                      <div className="font-bold text-indigo-900">
+                        ${amounts.tithe.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                      <div className="text-xs text-indigo-600">
+                        {amounts.titheETH.toFixed(6)} ETH
+                      </div>
+                    </div>
                   </div>
                   {amounts.offering > 0 && (
                     <div className="flex justify-between text-lg">
                       <span className="text-indigo-700">Additional Offering:</span>
-                      <span className="font-bold text-indigo-900">
-                        ${amounts.offering.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
+                      <div className="text-right">
+                        <div className="font-bold text-indigo-900">
+                          ${amounts.offering.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                        <div className="text-xs text-indigo-600">
+                          {amounts.offeringETH.toFixed(6)} ETH
+                        </div>
+                      </div>
                     </div>
                   )}
                   <div className="flex justify-between pt-3 border-t-2 border-indigo-300">
                     <span className="font-bold text-indigo-900 text-xl">Total Monthly Giving:</span>
-                    <span className="font-bold text-indigo-600 text-2xl">
-                      ${amounts.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </span>
+                    <div className="text-right">
+                      <div className="font-bold text-indigo-600 text-2xl">
+                        ${amounts.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                      <div className="text-sm text-indigo-700 font-semibold">
+                        {amounts.totalETH.toFixed(6)} ETH
+                      </div>
+                    </div>
                   </div>
                   <div className="text-center pt-2">
                     <p className="text-sm text-indigo-700">
                       Annual Total: <span className="font-semibold">${(amounts.total * 12).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className="text-xs text-indigo-600 ml-2">({(amounts.totalETH * 12).toFixed(6)} ETH)</span>
                     </p>
                   </div>
                 </div>
@@ -729,22 +785,37 @@ export default function CreateTithe() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600">Per Payment:</span>
-                  <span className="font-semibold text-indigo-600">
-                    {amounts.total.toFixed(4)} ETH
-                  </span>
+                  <div className="text-right">
+                    <div className="font-semibold text-indigo-600">
+                      {amounts.totalETH.toFixed(6)} ETH
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      ${amounts.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                  </div>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600">Tithe ({formData.tithePercentage}%):</span>
-                  <span className="font-medium text-slate-700">
-                    {amounts.tithe.toFixed(4)} ETH
-                  </span>
+                  <div className="text-right">
+                    <div className="font-medium text-slate-700">
+                      {amounts.titheETH.toFixed(6)} ETH
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      ${amounts.tithe.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                  </div>
                 </div>
                 {parseFloat(formData.offeringPercentage) > 0 && (
                   <div className="flex justify-between">
                     <span className="text-slate-600">Offering ({formData.offeringPercentage}%):</span>
-                    <span className="font-medium text-slate-700">
-                      {amounts.offering.toFixed(4)} ETH
-                    </span>
+                    <div className="text-right">
+                      <div className="font-medium text-slate-700">
+                        {amounts.offeringETH.toFixed(6)} ETH
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        ${amounts.offering.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
