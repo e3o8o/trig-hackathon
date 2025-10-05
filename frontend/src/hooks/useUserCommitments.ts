@@ -29,7 +29,7 @@ export interface Commitment {
 
 const STATUS_LABELS = ['active', 'paused', 'cancelled', 'completed']
 
-export function useUserCommitments() {
+export function useUserCommitments(refetchKey?: number) {
   const { address } = useAccount()
   const publicClient = usePublicClient()
   const [commitments, setCommitments] = useState<Commitment[]>([])
@@ -37,7 +37,7 @@ export function useUserCommitments() {
   const [error, setError] = useState<Error | null>(null)
 
   // Get commitment IDs for the user
-  const { data: commitmentIds, isLoading: isLoadingIds } = useReadContract({
+  const { data: commitmentIds, isLoading: isLoadingIds, refetch } = useReadContract({
     ...CONTRACTS.tithe,
     functionName: 'getGiverCommitments',
     args: address ? [address] : undefined,
@@ -152,13 +152,21 @@ export function useUserCommitments() {
     }
 
     fetchCommitmentDetails()
-  }, [commitmentIds, publicClient])
+  }, [commitmentIds, publicClient, refetchKey])
+
+  // Refetch when refetchKey changes
+  useEffect(() => {
+    if (refetchKey !== undefined && refetchKey > 0) {
+      refetch()
+    }
+  }, [refetchKey, refetch])
 
   return { 
     commitments, 
     isLoading: isLoadingIds || isLoading, 
     error,
     hasCommitments: commitments.length > 0,
+    refetch,
   }
 }
 

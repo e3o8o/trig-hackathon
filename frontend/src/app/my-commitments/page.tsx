@@ -81,8 +81,10 @@ const ETH_TO_USD = 4608.59
 export default function MyCommitmentsPage() {
   const { address, isConnected } = useAccount()
   
+  const [refetchKey, setRefetchKey] = useState(0)
+  
   // Get user's commitments from blockchain
-  const { commitments: blockchainCommitments, isLoading, hasCommitments } = useUserCommitments()
+  const { commitments: blockchainCommitments, isLoading, hasCommitments, refetch } = useUserCommitments(refetchKey)
   
   // Transaction hooks for pause/resume
   const { data: hash, isPending: isWritePending, writeContract, error: writeError } = useWriteContract()
@@ -137,6 +139,11 @@ export default function MyCommitmentsPage() {
     if (isConfirmed) {
       setShowSuccessMessage(true)
       setProcessingCommitmentId(null)
+      
+      // Refetch commitments to update UI with new status
+      setTimeout(() => {
+        setRefetchKey(prev => prev + 1)
+      }, 1000) // Small delay to ensure blockchain state is updated
       
       // Hide success message after 5 seconds
       setTimeout(() => {
@@ -351,6 +358,33 @@ export default function MyCommitmentsPage() {
               <p className="text-sm text-blue-900">
                 <strong>Demo Mode:</strong> Showing sample commitments. Create your first real commitment to see live blockchain data!
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transaction Confirming Notification */}
+      {isConfirming && hash && (
+        <div className="bg-blue-50 border-b border-blue-200">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                <div>
+                  <p className="font-semibold text-blue-900">Confirming Transaction...</p>
+                  <p className="text-sm text-blue-700">
+                    Please wait while your transaction is being confirmed on the blockchain.
+                  </p>
+                </div>
+              </div>
+              <a
+                href={getBlockExplorerUrl(hash)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-700 hover:text-blue-900 underline"
+              >
+                View on Explorer →
+              </a>
             </div>
           </div>
         </div>
