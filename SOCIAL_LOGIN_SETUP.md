@@ -263,20 +263,30 @@ features: {
 
 ## 🆘 **Troubleshooting**
 
+### **"Failed to fetch" or 403 errors in console?**
+- **This is normal!** WalletConnect tries to fetch cloud configuration and falls back to defaults
+- The app still works - this is just a warning, not a critical error
+- To remove the warning:
+  - Add `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` to Vercel environment variables
+  - Verify Project ID is correct in WalletConnect Cloud
+  - Check if project is active and has proper permissions
+
 ### **Social logins not showing?**
 - Check if Auth is enabled in WalletConnect Cloud
 - Verify OAuth credentials are added
+- Uncomment the `features` section in `wagmi.ts`
 - Check browser console for errors
 
-### **403 Forbidden error?**
-- Add `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` to Vercel
-- Verify Project ID is correct
-- Check if project is active in WalletConnect Cloud
-
 ### **OAuth redirect fails?**
-- Verify callback URLs match exactly
+- Verify callback URLs match exactly: `https://rpc.walletconnect.com/auth/v1/callback`
 - Check if OAuth app is in production mode (not development)
 - Ensure HTTPS is used in production
+- Verify all OAuth credentials are correct
+
+### **WalletConnect QR not showing?**
+- Verify Project ID is valid
+- Check if project has WalletConnect enabled in cloud dashboard
+- Try clearing browser cache
 
 ---
 

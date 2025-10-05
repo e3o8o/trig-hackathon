@@ -3,6 +3,7 @@ import { mainnet, sepolia, base, baseSepolia } from 'wagmi/chains'
 import { injected, walletConnect, coinbaseWallet } from 'wagmi/connectors'
 
 // Get WalletConnect project ID from environment variable
+// Fallback to the project ID you provided
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'ca12cb8ae0adfc5a8cead5726d60b574'
 
 export const config = createConfig({
@@ -12,6 +13,12 @@ export const config = createConfig({
     walletConnect({ 
       projectId,
       showQrModal: true,
+      metadata: {
+        name: 'Steward',
+        description: 'Christian Financial Stewardship on Blockchain',
+        url: typeof window !== 'undefined' ? window.location.origin : 'https://steward.app',
+        icons: ['https://avatars.githubusercontent.com/u/37784886']
+      }
     }),
     coinbaseWallet({
       appName: 'Steward - Christian Financial Stewardship',
