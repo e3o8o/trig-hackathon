@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
 import { WalletConnectButton } from '@/components/WalletConnectButton';
 import { UserMenu } from '@/components/UserMenu';
+import { useGivingHistory } from '@/hooks/useGivingHistory';
+import { getBlockExplorerUrl } from '@/config/contracts';
 import {
   ArrowLeft,
   Shield,
@@ -22,7 +24,11 @@ import {
   Search,
   BarChart3,
   PieChart,
+  Spinner,
 } from '@/components/Icons';
+
+// ETH to USD conversion rate
+const ETH_TO_USD = 4608.59;
 
 // Types
 interface Transaction {
@@ -37,9 +43,6 @@ interface Transaction {
   txHash: string;
   status: 'completed';
   commitmentId: string;
-  incomeAmount: number;
-  tithePercentage: number;
-  offeringPercentage: number;
 }
 
 interface YearlyStats {
@@ -53,6 +56,9 @@ interface YearlyStats {
 
 export default function GivingHistoryPage() {
   const { address, isConnected } = useAccount();
+  
+  // Fetch giving history from blockchain
+  const { transactions: blockchainTransactions, isLoading: isLoadingHistory, hasTransactions } = useGivingHistory();
 
   // State - Use static year to avoid hydration mismatch
   const [selectedYear, setSelectedYear] = useState<number>(2024);
@@ -61,174 +67,31 @@ export default function GivingHistoryPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [viewMode, setViewMode] = useState<'list' | 'chart'>('list');
   const [expandedTx, setExpandedTx] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  // Mock transaction data
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Transform blockchain transactions to UI format
   const transactions: Transaction[] = useMemo(() => {
-    if (!isConnected) return [];
+    if (!isConnected || !hasTransactions) return [];
 
-    return [
-      {
-        id: '1',
-        date: new Date('2024-12-01'),
-        churchName: 'Grace Community Church',
-        churchAddress: '123 Faith St, Dallas, TX',
-        type: 'both',
-        titheAmount: 800,
-        offeringAmount: 400,
-        totalAmount: 1200,
-        txHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-        status: 'completed',
-        commitmentId: 'c1',
-        incomeAmount: 8000,
-        tithePercentage: 10,
-        offeringPercentage: 5,
-      },
-      {
-        id: '2',
-        date: new Date('2024-11-01'),
-        churchName: 'Grace Community Church',
-        churchAddress: '123 Faith St, Dallas, TX',
-        type: 'both',
-        titheAmount: 800,
-        offeringAmount: 400,
-        totalAmount: 1200,
-        txHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
-        status: 'completed',
-        commitmentId: 'c1',
-        incomeAmount: 8000,
-        tithePercentage: 10,
-        offeringPercentage: 5,
-      },
-      {
-        id: '3',
-        date: new Date('2024-10-01'),
-        churchName: 'Grace Community Church',
-        churchAddress: '123 Faith St, Dallas, TX',
-        type: 'both',
-        titheAmount: 800,
-        offeringAmount: 400,
-        totalAmount: 1200,
-        txHash: '0x7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456',
-        status: 'completed',
-        commitmentId: 'c1',
-        incomeAmount: 8000,
-        tithePercentage: 10,
-        offeringPercentage: 5,
-      },
-      {
-        id: '4',
-        date: new Date('2024-09-01'),
-        churchName: 'Grace Community Church',
-        churchAddress: '123 Faith St, Dallas, TX',
-        type: 'both',
-        titheAmount: 800,
-        offeringAmount: 400,
-        totalAmount: 1200,
-        txHash: '0x4567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234',
-        status: 'completed',
-        commitmentId: 'c1',
-        incomeAmount: 8000,
-        tithePercentage: 10,
-        offeringPercentage: 5,
-      },
-      {
-        id: '5',
-        date: new Date('2024-08-01'),
-        churchName: 'Hope Fellowship',
-        churchAddress: '456 Prayer Ave, Austin, TX',
-        type: 'tithe',
-        titheAmount: 500,
-        offeringAmount: 0,
-        totalAmount: 500,
-        txHash: '0x890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678',
-        status: 'completed',
-        commitmentId: 'c2',
-        incomeAmount: 5000,
-        tithePercentage: 10,
-        offeringPercentage: 0,
-      },
-      {
-        id: '6',
-        date: new Date('2024-07-01'),
-        churchName: 'Hope Fellowship',
-        churchAddress: '456 Prayer Ave, Austin, TX',
-        type: 'tithe',
-        titheAmount: 500,
-        offeringAmount: 0,
-        totalAmount: 500,
-        txHash: '0xdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd',
-        status: 'completed',
-        commitmentId: 'c2',
-        incomeAmount: 5000,
-        tithePercentage: 10,
-        offeringPercentage: 0,
-      },
-      {
-        id: '7',
-        date: new Date('2024-06-01'),
-        churchName: 'Grace Community Church',
-        churchAddress: '123 Faith St, Dallas, TX',
-        type: 'both',
-        titheAmount: 800,
-        offeringAmount: 400,
-        totalAmount: 1200,
-        txHash: '0x567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456',
-        status: 'completed',
-        commitmentId: 'c1',
-        incomeAmount: 8000,
-        tithePercentage: 10,
-        offeringPercentage: 5,
-      },
-      {
-        id: '8',
-        date: new Date('2024-05-01'),
-        churchName: 'Grace Community Church',
-        churchAddress: '123 Faith St, Dallas, TX',
-        type: 'both',
-        titheAmount: 800,
-        offeringAmount: 400,
-        totalAmount: 1200,
-        txHash: '0xabcdef567890abcdef1234567890abcdef1234567890abcdef1234567890abcd',
-        status: 'completed',
-        commitmentId: 'c1',
-        incomeAmount: 8000,
-        tithePercentage: 10,
-        offeringPercentage: 5,
-      },
-      {
-        id: '9',
-        date: new Date('2023-12-01'),
-        churchName: 'Grace Community Church',
-        churchAddress: '123 Faith St, Dallas, TX',
-        type: 'both',
-        titheAmount: 750,
-        offeringAmount: 375,
-        totalAmount: 1125,
-        txHash: '0x234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
-        status: 'completed',
-        commitmentId: 'c1',
-        incomeAmount: 7500,
-        tithePercentage: 10,
-        offeringPercentage: 5,
-      },
-      {
-        id: '10',
-        date: new Date('2023-11-01'),
-        churchName: 'Grace Community Church',
-        churchAddress: '123 Faith St, Dallas, TX',
-        type: 'both',
-        titheAmount: 750,
-        offeringAmount: 375,
-        totalAmount: 1125,
-        txHash: '0x7890abcdef234567890abcdef1234567890abcdef1234567890abcdef12345678',
-        status: 'completed',
-        commitmentId: 'c1',
-        incomeAmount: 7500,
-        tithePercentage: 10,
-        offeringPercentage: 5,
-      },
-    ];
-  }, [isConnected]);
+    return blockchainTransactions.map(tx => ({
+      id: tx.id,
+      date: tx.date,
+      churchName: tx.organizationName,
+      churchAddress: tx.organizationAddress,
+      type: 'tithe' as const, // For now, treating all as tithe
+      titheAmount: tx.amountUSD,
+      offeringAmount: 0, // TODO: Separate tithe/offering in contract
+      totalAmount: tx.amountUSD,
+      txHash: tx.txHash,
+      status: 'completed' as const,
+      commitmentId: String(tx.commitmentId),
+    }));
+  }, [isConnected, hasTransactions, blockchainTransactions]);
 
   // Calculate available years
   const availableYears = useMemo(() => {
@@ -430,7 +293,42 @@ export default function GivingHistoryPage() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
+        {/* Loading State */}
+        {!mounted || isLoadingHistory ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <Spinner className="w-12 h-12 text-indigo-600 mx-auto mb-4" />
+              <p className="text-gray-600">Loading your giving history from blockchain...</p>
+            </div>
+          </div>
+        ) : (
+        <>
+        {/* No Transactions Yet Banner */}
+        {!hasTransactions && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+            <div className="flex items-start space-x-3">
+              <FileText className="w-6 h-6 text-blue-600 mt-1" />
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                  No Giving History Yet
+                </h3>
+                <p className="text-blue-700 mb-4">
+                  Your giving transactions will appear here once you make payments through your active commitments.
+                  Create a commitment to get started!
+                </p>
+                <Link 
+                  href="/create-tithe"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Create First Commitment
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Export Buttons */}
+        {hasTransactions && (
         <div className="mb-8">
           <div className="flex justify-end">
             <div className="flex gap-3">
@@ -451,8 +349,10 @@ export default function GivingHistoryPage() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Yearly Summary Cards */}
+        {hasTransactions && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-2">
@@ -506,8 +406,10 @@ export default function GivingHistoryPage() {
             </p>
           </div>
         </div>
+        )}
 
         {/* Yearly Summary Section */}
+        {hasTransactions && (
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
@@ -569,8 +471,10 @@ export default function GivingHistoryPage() {
             ))}
           </div>
         </div>
+        )}
 
         {/* Filters */}
+        {hasTransactions && (
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
             <Filter className="w-5 h-5" />
@@ -648,8 +552,10 @@ export default function GivingHistoryPage() {
               </div>
             </div>
         </div>
+        )}
 
         {/* View Mode Toggle */}
+        {hasTransactions && (
         <div className="mb-6 flex justify-end">
           <button
             onClick={() => setViewMode(viewMode === 'list' ? 'chart' : 'list')}
@@ -668,9 +574,10 @@ export default function GivingHistoryPage() {
             )}
           </button>
         </div>
+        )}
 
         {/* Chart View */}
-        {viewMode === 'chart' && (
+        {hasTransactions && viewMode === 'chart' && (
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-6">Monthly Giving Breakdown</h3>
             
@@ -724,7 +631,7 @@ export default function GivingHistoryPage() {
         )}
 
         {/* Transaction List */}
-        {viewMode === 'list' && (
+        {hasTransactions && viewMode === 'list' && (
           <div className="space-y-4">
             {filteredTransactions.length === 0 ? (
               <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-200 text-center">
@@ -801,27 +708,25 @@ export default function GivingHistoryPage() {
                         <div className="space-y-4">
                           <div>
                             <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                              Church Details
+                              Organization
                             </h4>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-900 font-medium mb-1">
+                              {tx.churchName}
+                            </p>
+                            <p className="text-xs text-gray-500 font-mono">
                               {tx.churchAddress}
                             </p>
                           </div>
                           <div>
                             <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                              Income Details
+                              Commitment Details
                             </h4>
                             <p className="text-sm text-gray-600">
-                              Income: {formatCurrency(tx.incomeAmount)}
+                              Commitment ID: #{tx.commitmentId}
                             </p>
                             <p className="text-sm text-gray-600">
-                              Tithe: {tx.tithePercentage}% = {formatCurrency(tx.titheAmount)}
+                              Amount: {formatCurrency(tx.totalAmount)}
                             </p>
-                            {tx.offeringPercentage > 0 && (
-                              <p className="text-sm text-gray-600">
-                                Offering: {tx.offeringPercentage}% = {formatCurrency(tx.offeringAmount)}
-                              </p>
-                            )}
                           </div>
                         </div>
 
@@ -829,21 +734,18 @@ export default function GivingHistoryPage() {
                         <div className="space-y-4">
                           <div>
                             <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                              Blockchain Proof
+                              Payment Record
                             </h4>
-                            <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                              <code className="text-xs text-gray-600 flex-1 font-mono">
-                                {shortenTxHash(tx.txHash)}
-                              </code>
-                              <a
-                                href={`https://etherscan.io/tx/${tx.txHash}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 text-sm font-medium"
-                              >
-                                View
-                                <ExternalLink className="w-4 h-4" />
-                              </a>
+                            <div className="p-3 bg-gray-50 rounded-lg space-y-2">
+                              <p className="text-sm text-gray-600">
+                                Payment #{tx.id.split('-')[1]}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                From Commitment #{tx.commitmentId}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                This payment is part of your automated tithe commitment recorded on the blockchain.
+                              </p>
                             </div>
                           </div>
                           <div>
@@ -869,6 +771,8 @@ export default function GivingHistoryPage() {
               ))
             )}
           </div>
+        )}
+        </>
         )}
         </div>
       </main>
