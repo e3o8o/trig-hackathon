@@ -57,8 +57,8 @@ export default function Home() {
               </>
             ) : (
               <>
-                <Link href="/mission-protection" className="text-slate-700 hover:text-indigo-600 transition-colors">
-                  Mission Protection
+                <Link href="/my-protections" className="text-slate-700 hover:text-indigo-600 transition-colors">
+                  My Protection
                 </Link>
                 <Link href="/my-commitments" className="text-slate-700 hover:text-indigo-600 transition-colors">
                   My Commitments
@@ -131,11 +131,11 @@ export default function Home() {
               ) : (
                 <>
                   <Link 
-                    href="/mission-protection" 
+                    href="/my-protections" 
                     onClick={() => setMobileMenuOpen(false)}
                     className="text-slate-700 hover:text-indigo-600 transition-colors py-2"
                   >
-                    Mission Protection
+                    My Protection
                   </Link>
                   <Link 
                     href="/my-commitments" 
