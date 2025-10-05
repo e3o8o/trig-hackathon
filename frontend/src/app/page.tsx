@@ -225,7 +225,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      {!isConnected && (
+      {isHydrated && !isConnected && (
         <section id="features" className="container mx-auto px-4 py-20">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
@@ -326,7 +326,7 @@ export default function Home() {
       )}
 
       {/* How It Works */}
-      {!isConnected && (
+      {isHydrated && !isConnected && (
         <section id="how-it-works" className="container mx-auto px-4 py-20 bg-white/50 rounded-3xl my-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
@@ -383,7 +383,7 @@ export default function Home() {
       )}
 
       {/* For Churches */}
-      {!isConnected && (
+      {isHydrated && !isConnected && (
         <section id="for-churches" className="container mx-auto px-4 py-20">
           <div className="max-w-5xl mx-auto bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl p-12 md:p-16 text-white shadow-2xl">
             <div className="flex flex-col md:flex-row items-center gap-12">
@@ -432,6 +432,7 @@ export default function Home() {
       )}
 
       {/* FAQ Section */}
+      {isHydrated && (
       <section id="faq" className="container mx-auto px-4 py-20">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
@@ -618,8 +619,10 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* CTA Section */}
+      {isHydrated && (
       <section className="container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
@@ -636,8 +639,10 @@ export default function Home() {
           </Link>
         </div>
       </section>
+      )}
 
       {/* Footer */}
+      {isHydrated && (
       <footer className="container mx-auto px-4 py-12 border-t border-slate-200 mt-20">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 mb-8">
@@ -698,6 +703,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      )}
     </div>
   );
 }
