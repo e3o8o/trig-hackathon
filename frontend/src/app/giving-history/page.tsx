@@ -74,6 +74,7 @@ export default function GivingHistoryPage() {
     setMounted(true);
   }, []);
 
+
   // Transform blockchain transactions to UI format
   const transactions: Transaction[] = useMemo(() => {
     if (!isConnected || !hasTransactions) return [];
@@ -224,6 +225,7 @@ export default function GivingHistoryPage() {
   };
 
   const formatDate = (date: Date) => {
+    if (!mounted) return 'Loading...';
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -234,6 +236,18 @@ export default function GivingHistoryPage() {
   const shortenTxHash = (hash: string) => {
     return `${hash.slice(0, 6)}...${hash.slice(-4)}`;
   };
+
+  // Hydration check
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Not connected state
   if (!isConnected) {
